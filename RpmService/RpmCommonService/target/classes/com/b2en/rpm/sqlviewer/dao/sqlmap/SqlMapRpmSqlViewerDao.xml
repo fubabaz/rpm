@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.2//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="SqlMapRpmSqlViewerDao">
+
+	<select id="selectSqlInfoList" resultType="com.b2en.rpm.sqlviewer.vo.SqlViewerSqlInfo">
+		-- SQL Viewer > SQL Cursor > SQL List + SQL Information
+		SELECT   -- Overview
+		         A.INST_ID
+		       , A.SQL_ID
+		       , A.CHILD_NUMBER
+		       , A.PLAN_HASH_VALUE
+		       , A.PARSING_SCHEMA_NAME
+		       , A.SERVICE
+		       , A.MODULE
+		       , A.ACTION
+		       , TO_CHAR (TO_DATE (A.FIRST_LOAD_TIME, 'YYYY-MM-DD/HH24:MI:SS'), 'YYYY-MM-DD HH24:MI:SS') AS FIRST_LOAD_TIME
+		       , TO_CHAR (TO_DATE (A.LAST_LOAD_TIME , 'YYYY-MM-DD/HH24:MI:SS'), 'YYYY-MM-DD HH24:MI:SS') AS LAST_LOAD_TIME
+		       , TO_CHAR (A.LAST_ACTIVE_TIME, 'YYYY-MM-DD HH24:MI:SS') AS LAST_ACTIVE_TIME
+		       , A.LOADS
+		       , A.INVALIDATIONS
+		       , A.PARSE_CALLS
+		       , A.EXECUTIONS
+		       , A.PX_SERVERS_EXECUTIONS / A.EXECUTIONS_N AS PX_DOP
+		       , (A.FETCHES        / A.EXECUTIONS_N) AS FETCHES
+		       --, USF_UNIT (A.SORTS          / A.EXECUTIONS_N, 1000) AS SORTS
+		       --, USF_UNIT (A.ROWS_PROCESSED / A.EXECUTIONS_N, 1000) AS ROWS_PROCESSED
+		         -- I/O Statistics
+		       ,  (A.BUFFER_GETS                    / A.EXECUTIONS_N) AS BUFFER_GETS
+		       ,  (A.DISK_READS                     / A.EXECUTIONS_N) AS DISK_READS
+		       ,  (A.DIRECT_WRITES                  / A.EXECUTIONS_N) AS DIRECT_WRITES
+		       ,  (A.PHYSICAL_READ_REQUESTS         / A.EXECUTIONS_N) AS PHYSICAL_READ_REQUESTS
+		       ,  (A.PHYSICAL_WRITE_REQUESTS        / A.EXECUTIONS_N) AS PHYSICAL_WRITE_REQUESTS
+		       ,  (A.OPTIMIZED_PHY_READ_REQUESTS    / A.EXECUTIONS_N) AS OPTIMIZED_PHY_READ_REQUESTS
+		       ,  (A.IO_INTERCONNECT_BYTES          / A.EXECUTIONS_N) AS IO_INTERCONNECT_BYTES
+		       ,  (A.PHYSICAL_READ_BYTES            / A.EXECUTIONS_N) AS PHYSICAL_READ_BYTES
+		       ,  (A.PHYSICAL_WRITE_BYTES           / A.EXECUTIONS_N) AS PHYSICAL_WRITE_BYTES
+		       ,  (A.IO_CELL_OFFLOAD_ELIGIBLE_BYTES / A.EXECUTIONS_N) AS IO_CELL_OFFLOAD_ELIGIBLE_BYTES
+		       ,  (A.IO_CELL_OFFLOAD_RETURNED_BYTES / A.EXECUTIONS_N) AS IO_CELL_OFFLOAD_RETURNED_BYTES
+		       ,  (A.IO_CELL_UNCOMPRESSED_BYTES     / A.EXECUTIONS_N) AS IO_CELL_UNCOMPRESSED_BYTES
+		     --  ,  (A.IM_SCANS                       / A.EXECUTIONS_N) AS IM_SCANS
+		     --  ,  (A.IM_SCAN_BYTES_UNCOMPRESSED     / A.EXECUTIONS_N) AS IM_SCAN_BYTES_UNCOMPRESSED
+		    --   ,  (A.IM_SCAN_BYTES_INMEMORY         / A.EXECUTIONS_N) AS IM_SCAN_BYTES_INMEMORY
+		         -- Wait Statistics
+		       , SUBSTR (NUMTODSINTERVAL (A.ELAPSED_TIME          / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS ELAPSED_TIME
+		       , SUBSTR (NUMTODSINTERVAL (A.CPU_TIME              / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS CPU_TIME
+		       , SUBSTR (NUMTODSINTERVAL (A.USER_IO_WAIT_TIME     / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS USER_IO_WAIT_TIME
+		       , SUBSTR (NUMTODSINTERVAL (A.CONCURRENCY_WAIT_TIME / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS CONCURRENCY_WAIT_TIME
+		       , SUBSTR (NUMTODSINTERVAL (A.APPLICATION_WAIT_TIME / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS APPLICATION_WAIT_TIME
+		       , SUBSTR (NUMTODSINTERVAL (A.CLUSTER_WAIT_TIME     / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS CLUSTER_WAIT_TIME
+		       , SUBSTR (NUMTODSINTERVAL (A.OTHER_WAIT_TIME       / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS OTHER_WAIT_TIME
+		         -- Time Statistics
+		       , SUBSTR (NUMTODSINTERVAL (A.PLSQL_EXEC_TIME       / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS PLSQL_EXEC_TIME
+		       , SUBSTR (NUMTODSINTERVAL (A.JAVA_EXEC_TIME        / A.EXECUTIONS_N / 1000000, 'SECOND'), 12, 11) AS JAVA_EXEC_TIME
+		         -- Workarea Statistics
+		       ,  (A.LAST_MEMORY_USED ) AS LAST_MEMORY_USED
+		       ,  (A.LAST_TEMPSEG_SIZE) AS LAST_TEMPSEG_SIZE
+		    FROM (SELECT A.*
+		               , DECODE (NVL (A.EXECUTIONS, 0), 0, 1, A.EXECUTIONS) AS EXECUTIONS_N
+		               , A.ELAPSED_TIME - (A.CPU_TIME + A.USER_IO_WAIT_TIME + A.CONCURRENCY_WAIT_TIME + A.APPLICATION_WAIT_TIME + A.CLUSTER_WAIT_TIME) AS OTHER_WAIT_TIME
+		               , B.LAST_MEMORY_USED
+		               , B.LAST_TEMPSEG_SIZE
+		            FROM gv$sql A
+		               , (SELECT   /*+ NO_MERGE */
+		                           A.INST_ID
+		                         , A.SQL_ID
+		                         , A.CHILD_NUMBER
+		                         , SUM (A.LAST_MEMORY_USED ) AS LAST_MEMORY_USED
+		                         , SUM (A.LAST_TEMPSEG_SIZE) AS LAST_TEMPSEG_SIZE
+		                         , COUNT (*) AS USAGE
+		                      FROM gv$sql_workarea A
+		                  GROUP BY A.INST_ID
+		                         , A.SQL_ID
+		                         , A.CHILD_NUMBER) B
+		           WHERE 1 = 1
+		          -- AND A.SQL_ID = :V_SQL_ID
+		           AND A.SERVICE NOT IN ('SYS$USERS', 'SYS$BACKGROUND')
+		         --  AND A.EXECUTIONS >= 5
+		         --  AND A.ELAPSED_TIME >= 1000000
+		          -- AND A.BUFFER_GETS / DECODE (NVL (A.EXECUTIONS, 0), 0, 1, A.EXECUTIONS) >= 1000000
+		             AND B.INST_ID(+) = A.INST_ID
+		             AND B.SQL_ID(+) = A.SQL_ID
+		             AND B.CHILD_NUMBER(+) = A.CHILD_NUMBER) A
+		ORDER BY A.INST_ID
+		       , A.SQL_ID
+		       , A.CHILD_NUMBER
+	</select>
+	
+	<select id="selectOverViewList" parameterType="com.b2en.rpm.sqlviewer.vo.SqlViewerParamInfo" resultType="com.b2en.rpm.sqlviewer.vo.SqlViewerOverViewInfo">
+		SELECT   DISTINCT
+		         a.name AS NAME
+		       , a.value_string AS VALUE_STRING
+		       , a.datatype_string AS DATETYPE_STRING
+		       , a.datatype AS DATATYPE
+		    FROM gv$sql_bind_capture a
+		   WHERE  a.inst_id = #{instId}
+		     AND a.sql_id = #{sqlId}
+		     AND a.child_number = #{childNumber}
+		ORDER BY a.name
+	</select>
+	
+</mapper>

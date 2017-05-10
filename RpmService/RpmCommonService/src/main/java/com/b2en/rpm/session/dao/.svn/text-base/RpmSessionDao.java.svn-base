@@ -1,0 +1,16 @@
+package com.b2en.rpm.session.dao;
+
+import java.util.List;
+
+import com.b2en.rpm.session.vo.SessionStatisticsInfo;
+import com.b2en.rpm.session.vo.SessionViewInfo;
+
+public interface RpmSessionDao {
+
+	public List<SessionViewInfo> selectSessionViewerList();
+	
+	public String selectSqlFullTextInfo(SessionViewInfo sessionViewInfo);
+
+	public List<SessionStatisticsInfo> selectStatisticsList(SessionViewInfo sessionViewInfo);
+	
+}

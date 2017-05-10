@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.2//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="SqlMapASHViewPartDao">
+
+	<select id="selectAshSampleTime" parameterType="" resultType="">
+		WITH w1 AS (SELECT   TO_CHAR (a.sample_time, 'YYYY-MM-DD HH24:"00"') AS sample_time
+                   , COUNT (CASE WHEN a.session_state = 'ON CPU'  THEN 1 END) AS cpu
+                   , COUNT (CASE WHEN a.session_state = 'WAITING' THEN 1 END) AS wait
+                FROM gv$active_session_history a
+               WHERE 1 = 1
+                 AND a.inst_id = :v_inst_id
+                 AND a.sample_time <= TRUNC (SYSDATE, 'HH')
+            GROUP BY TO_CHAR (a.sample_time, 'YYYY-MM-DD HH24:"00"'))
+		SELECT  a.sample_time
+       		  , a.cpu
+       		  , a.wait
+    	  FROM  ( SELECT  a.*
+                       ,  ROW_NUMBER () OVER (ORDER BY a.sample_time) AS RN
+                    FROM w1 a) a
+         WHERE a.rn > 1
+     ORDER BY a.sample_time DESC
+	</select>
+
+
+</mapper>

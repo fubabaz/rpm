@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="com.b2en.rpm.ui.rcp.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="com.b2en.rpm.ui.rcp.perspective.InitialPerspective"
+            icon="icons/welcome16.gif"
+            id="RpmUIRcp.InitialPerspective"
+            name="Initial">
+      </perspective>
+      <perspective
+            class="com.b2en.rpm.ui.rcp.perspective.SystemPerspective"
+            icon="icons/monitor_icon.png"
+            id="RpmUIRcp.SystemPerspective"
+            name="System">
+      </perspective>
+      <perspective
+            class="com.b2en.rpm.ui.rcp.perspective.SessionViewerPerspective"
+            icon="icons/document_info.png"
+            id="RpmUIRcp.SessionViewerPerspective"
+            name="SessionViewer">
+      </perspective>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="RpmUIRcp.application"
+            name="Real-time performance monitoring">
+         <property
+               name="appName"
+               value="Real-time performance monitoring">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            class="com.b2en.rpm.ui.rcp.view.part.SystemMonitorViewPart"
+            icon="icons/toolbar/1.png"
+            id="RpmUIRcp.SystemMonitorViewPart"
+            name="System Monitor"
+            restorable="false">
+      </view>
+      <view
+            allowMultiple="true"
+            class="com.b2en.rpm.ui.rcp.view.part.ASHViewPart"
+            icon="icons/toolbar/2.png"
+            id="RpmUIRcp.ASHViewPart"
+            name="ASH Monitor"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="true"
+            class="com.b2en.rpm.ui.rcp.view.part.AWRViewPart"
+            icon="icons/toolbar/3.png"
+            id="RpmUIRcp.AWRViewPart"
+            name="AWR Monitor"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="true"
+            class="com.b2en.rpm.ui.rcp.view.session.SessionListView"
+            icon="icons/toolbar/4.png"
+            id="RpmUIRcp.SessionListView"
+            name="Session Viewer"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="true"
+            class="com.b2en.rpm.ui.rcp.view.sqlviewer.SqlViewerView"
+            icon="icons/toolbar/5.png"
+            id="RpmUIRcp.SqlViewerView"
+            name="SQL Viewer"
+            restorable="true">
+      </view>
+      <view
+            class="rpmuircp.ViewPart1"
+            icon="icons/welcome16.gif"
+            id="RpmUIRcp.view1"
+            name="Object Viewer"
+            restorable="true">
+      </view>
+      <view
+            class="rpmuircp.ViewPart2"
+            icon="icons/sqlviewer/script.png"
+            id="RpmUIRcp.view2"
+            name="SQL Tuner"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.b2en.rpm.ui.rcp.preference.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.b2en.rpm.ui.rcp.preference.page.DBConnPrefPage"
+            id="RpmUIRcp.DatabaseInfo"
+            name="DB Info">
+      </page>
+   </extension>
+ 
+    <extension
+         point="org.eclipse.ui.themes">
+      <theme
+            id="de.spiritlink.custom.ui.theme"
+            name="Custom Theme">
+         <colorOverride
+               id="org.eclipse.ui.workbench.ACTIVE_TAB_BG_END"
+               value="240,240,240">
+         </colorOverride>
+          <colorOverride
+               id="org.eclipse.ui.workbench.ACTIVE_TAB_TEXT_COLOR"
+               value="240,240,240">
+         </colorOverride>
+         <colorOverride
+               id="org.eclipse.ui.workbench.ACTIVE_TAB_BG_START"
+                value="255,255,255">
+         </colorOverride>
+          <colorOverride
+               id="org.eclipse.ui.workbench.ACTIVE_TAB_TEXT_COLOR"
+               value="0,0,0">
+         </colorOverride>               
+      </theme>
+   </extension>
+    <extension
+         point="org.eclipse.ui.themes">
+	      <theme
+	            id="de.spiritlink.custom.ui.theme01"
+	            name="Custom Theme">
+	             <colorOverride
+               id="org.eclipse.ui.workbench.ACTIVE_TAB_TEXT_COLOR"
+               value="240,240,240">
+         </colorOverride>
+	         <colorOverride
+	               id="org.eclipse.ui.workbench.ACTIVE_TAB_BG_END"
+	               value="240,240,240">
+	         </colorOverride>
+	         <colorOverride
+	               id="org.eclipse.ui.workbench.ACTIVE_TAB_BG_START"
+	               value="255,255,255">
+	         </colorOverride>
+	          <colorOverride
+	               id="org.eclipse.ui.workbench.ACTIVE_TAB_TEXT_COLOR"
+	               value="0,0,0">
+	         </colorOverride>               
+	      </theme>
+      </extension>
+    
+    <extension
+          point="org.eclipse.ui.splashHandlers">
+       <splashHandler
+             class="rpmuircp.splashHandlers.InteractiveSplashHandler"
+             id="rpmuircp.splashHandlers.interactive">
+       </splashHandler>
+    </extension>
+    <extension
+      point="org.eclipse.e4.ui.css.swt.theme">
+      <theme
+         basestylesheeturi="css/wfs_default_win7.css"
+         id="com.workflowscience.designer.themeDef"
+         label="Windows 7 Custom Theme"
+         os="win32"
+         os_version="6.1">
+      </theme>
+   </extension>
+
+</plugin>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.2//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="SqlMapRpmCommonDao">
+
+	<select id="selectSchemaTableColumnInfoList" parameterType="com.b2en.rpm.common.vo.SchemaTableInfo" resultType="com.b2en.rpm.common.vo.SchemaTableInfo">
+		SELECT 
+			A.TABLE_NAME AS TBL_NM
+			,A.COMMENTS AS TBL_COMNT
+			,B.COLUMN_NAME AS COL_NM
+			,B.COMMENTS AS COL_COMNT
+		FROM ALL_TAB_COMMENTS A
+			,ALL_COL_COMMENTS B
+		WHERE A.OWNER = B.OWNER
+		AND A.TABLE_NAME = B.TABLE_NAME
+		<if test="owner != null">
+			AND A.OWNER = UPPER(#{owner})
+		</if>
+		<if test="tblType != null">
+			AND A.TABLE_TYPE = #{tblType}
+		</if>
+	</select>
+
+</mapper>

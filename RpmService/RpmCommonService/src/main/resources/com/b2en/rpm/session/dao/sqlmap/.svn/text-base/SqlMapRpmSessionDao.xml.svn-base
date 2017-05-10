@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.2//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="SqlMapRpmSessionDao">
+
+	<select id="selectSessionViewerList" resultType="com.b2en.rpm.session.vo.SessionViewInfo">
+		SELECT   /*+ USE_HASH(A B) */
+	         NVL2 (b.qcinst_id, LPAD (' ', 2, ' ') || d.pname || ' (' || b.server_group || ',' || b.server_set || ',' || b.server# || ')', a.username) AS username
+	       , NVL2 (b.qcinst_id, 2, 1) AS depth
+	       , a.inst_id
+	       , a.sid
+	       , a.serial# AS serial
+	       , TO_CHAR (a.logon_time, 'YYYY-MM-DD HH24:MI') AS logon_time
+	       , a.status
+	       , a.service_name
+	       , a.module
+	       , a.action
+	       , a.client_info
+	    -- , a.machine
+	    -- , a.osuser
+	    -- , a.program
+	     --  , usf_unit (NVL2 (b.qcinst_id, c.consistent_gets, SUM (c.consistent_gets) OVER (PARTITION BY NVL (b.qcsid, a.sid))) * g.value, 1024) AS consistent_gets
+	     --  , usf_unit (NVL2 (b.qcinst_id, c.physical_reads , SUM (c.physical_reads)  OVER (PARTITION BY NVL (b.qcsid, a.sid))) * g.value, 1024) AS physical_reads
+	     --  , usf_unit (NVL2 (b.qcinst_id, d.pga_alloc_mem  , SUM (d.pga_alloc_mem)   OVER (PARTITION BY NVL (b.qcsid, a.sid)))          , 1024) AS pga_alloc_mem
+	     --  , usf_unit (NVL2 (b.qcinst_id, e.bytes          , SUM (e.bytes)           OVER (PARTITION BY NVL (b.qcsid, a.sid)))          , 1024) AS tempseg_usage
+	     --  , usf_unit (NVL2 (b.qcinst_id, f.used_ublk      , SUM (f.used_ublk)       OVER (PARTITION BY NVL (b.qcsid, a.sid))) * g.value, 1024) AS used_undo
+	       , NVL (a.sql_id, a.prev_sql_id) AS sql_id
+	       , NVL (a.sql_child_number, a.prev_child_number) AS sql_child_number
+	       , NVL (a.sql_exec_start, a.prev_exec_start) AS sql_exec_start
+	       , NVL (a.sql_exec_id, a.prev_exec_id) AS sql_exec_id
+	         --
+	       , GREATEST (COUNT (*) OVER (PARTITION BY NVL (b.qcinst_id, a.inst_id), NVL (b.qcsid, a.sid), NVL (b.qcserial#, a.serial#)) - 1, 1) AS px_dop
+	       , a.saddr
+	       , a.paddr
+	       , a.taddr
+	       , d.pid
+	       , d.serial# AS pserial
+	    FROM gv$session a
+	       , gv$px_session b
+	       , gv$sess_io c
+	       , gv$process d
+	       , (SELECT   a.inst_id
+	                 , a.session_addr
+	                 , SUM (a.blocks * b.block_size) AS bytes
+	              FROM gv$tempseg_usage a
+	                 , dba_tablespaces b
+	             WHERE b.tablespace_name = a.tablespace
+	          GROUP BY a.inst_id
+	                 , a.session_addr) e
+	       , gv$transaction f
+	       , v$parameter g
+	   WHERE a.type <![CDATA[<>]]> 'BACKGROUND'
+	     AND a.MODULE NOT LIKE 'oraagent.bin@%'
+	     AND b.inst_id(+) = a.inst_id
+	     AND b.saddr(+) = a.saddr
+	     AND c.inst_id(+) = a.inst_id
+	     AND c.sid(+) = a.sid
+	     AND d.inst_id(+) = a.inst_id
+	     AND d.addr(+) = a.paddr
+	     AND e.inst_id(+) = a.inst_id
+	     AND e.session_addr(+) = a.saddr
+	     AND f.inst_id(+) = a.inst_id
+	     AND f.addr(+) = a.taddr
+	     AND g.name(+) = 'db_block_size'
+	ORDER BY a.username
+	       , a.service_name
+	       , a.module
+	       , a.action
+	       , a.client_info
+	       , NVL (b.qcinst_id, a.inst_id)
+	       , NVL (b.qcsid, a.sid)
+	       , NVL (b.qcserial#, a.serial#)
+	       , b.qcserial# NULLS FIRST
+	       , b.server_group
+	       , b.server_set
+	       , b.server#
+	       , a.sql_id
+	       , a.sql_child_number
+	</select>
+
+	<select id="selectSqlFullTextInfo" parameterType="com.b2en.rpm.session.vo.SessionViewInfo" resultType="string">
+		SELECT a.sql_fulltext
+  		  FROM gv$sql a
+ 		 WHERE a.inst_id = #{instId}
+   		   AND a.sql_id = #{sqlId}
+   		   AND a.child_number = #{sqlChildNumber}
+   	</select>
+	
+	<select id="selectStatisticsList" parameterType="com.b2en.rpm.session.vo.SessionViewInfo" resultType="com.b2en.rpm.session.vo.SessionStatisticsInfo">
+		SELECT CASE b.class
+	             WHEN 1   THEN 'User'
+	             WHEN 2   THEN 'Redo'
+	             WHEN 4   THEN 'Enqueue'
+	             WHEN 8   THEN 'Cache'
+	             WHEN 16  THEN 'OS'
+	             WHEN 32  THEN 'RAC'
+	             WHEN 33  THEN 'RAC + User'
+	             WHEN 34  THEN 'RAC + Redo'
+	             WHEN 40  THEN 'RAC + Cache'
+	             WHEN 64  THEN 'SQL'
+	             WHEN 72  THEN 'SQL + Cache'
+	             WHEN 128 THEN 'Debug'
+	             WHEN 192 THEN 'Debug + SQL'
+	         END AS clazz
+	       , b.name
+	       , a.value
+	       , CASE
+	             WHEN REGEXP_LIKE (b.name, '(byte)|(memory)')
+	             THEN round(a.value/1024,2)
+	         END AS display_value
+	    FROM gv$sesstat a
+	       , v$statname b
+	   WHERE a.inst_id = #{instId}
+	     AND a.sid  = #{sid}
+	     AND a.value > 0
+	     AND b.statistic# = a.statistic#
+	ORDER BY b.class
+	       , b.name
+	</select>
+	
+</mapper>
