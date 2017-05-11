@@ -10,11 +10,22 @@
 		<module>RpmCommonVO</module>
 		<module>RpmCommonService</module>
 	</modules>
+	
 	<dependencies>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-		</dependency>		
+			<groupId>com.b2en</groupId>
+			<artifactId>B2enCommonVO</artifactId>
+			<version>1.0.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.b2en</groupId>
+			<artifactId>B2enCommonUtil</artifactId>
+			<version>1.0.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.b2en</groupId>
+			<artifactId>B2enCommonService</artifactId>
+			<version>1.0.0.0</version>
+		</dependency>
 	</dependencies>
 </project>

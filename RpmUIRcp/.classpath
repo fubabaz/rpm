@@ -18,13 +18,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/B2enFramework-1.0.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ojdbc6-11.2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.14.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/swing2swt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="Z:/JAR_REPO/jcommon-1.0.13.jar"/>
-	<classpathentry kind="lib" path="Z:/JAR_REPO/jfreechart-1.0.13.jar"/>
-	<classpathentry kind="lib" path="Z:/JAR_REPO/jfreechart-1.0.13-experimental.jar"/>
-	<classpathentry kind="lib" path="Z:/JAR_REPO/jfreechart-1.0.13-swt.jar"/>
-	<classpathentry kind="lib" path="Z:/JAR_REPO/swing2swt.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ym.seo/Desktop/RPM_WORK_NEW/repos/repository/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

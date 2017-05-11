@@ -30,4 +30,5 @@ Bundle-ClassPath: .,
  lib/jfreechart-1.0.13-experimental.jar,
  lib/jfreechart-1.0.13-swt.jar,
  lib/jfreechart-1.0.13.jar,
- lib/commons-dbcp-1.4.jar
+ lib/commons-dbcp-1.4.jar,
+ lib/swing2swt.jar
