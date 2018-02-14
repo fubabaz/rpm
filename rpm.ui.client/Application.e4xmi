@@ -11,7 +11,7 @@
     </mainMenu>
     <trimBars xmi:id="_9GGHgBCEEeieWLMHIdYM9w" elementId="rpm.ui.client.trimbar.0">
       <children xsi:type="menu:ToolBar" xmi:id="_FWy88BCGEeieWLMHIdYM9w" elementId="rpm.ui.client.toolbar.0">
-        <children xsi:type="menu:HandledToolItem" xmi:id="_i38GoBCGEeieWLMHIdYM9w" elementId="rpm.ui.client.handledtoolitem.connection" label="Connection" iconURI="" command="_pJakYBCJEeieWLMHIdYM9w"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_i38GoBCGEeieWLMHIdYM9w" elementId="rpm.ui.client.handledtoolitem.connection" label="Connection" iconURI="platform:/plugin/rpm.ui.client/icons/add_att.png" command="_pJakYBCJEeieWLMHIdYM9w"/>
       </children>
     </trimBars>
   </children>

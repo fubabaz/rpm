@@ -17,9 +17,11 @@
 package org.fubabaz.rpm.connection;
 
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ejpark
@@ -27,58 +29,61 @@ import java.net.UnknownHostException;
  */
 public class PingTest implements Runnable {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(PingTest.class);
+
 	public enum PING_RESULT {
-		SUCCESS,
-		HOST_NOT_FOUND,
-		NOT_CONNECTED,
-		TIMEOUT
-		;
+		SUCCESS, HOST_NOT_FOUND, NOT_CONNECTED, TIMEOUT;
 	};
 
 	private String host;
 	private int port;
 	private int maxWait;
 	private PING_RESULT result;
+
 	private PingTest(String host, int port, int maxWait) {
 		this.host = host;
 		this.port = port;
 		this.maxWait = maxWait;
 		this.result = PING_RESULT.HOST_NOT_FOUND;
 	}
-	
+
 	@Override
 	public void run() {
 		Socket socket = null;
 		try {
-			InetAddress inetAddress = InetAddress.getByName(host);
-			if (inetAddress.isReachable(maxWait)) {
-				socket = new Socket(inetAddress, port);
-				if(socket.isConnected()) {
+			LOGGER.debug("inetSocketAddress>>host:{}, port:{}", host, port);
+			InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
+			if (inetSocketAddress.isUnresolved()) {
+				LOGGER.debug("inetSocketAddress>>isUnresolved:{}", inetSocketAddress.isUnresolved());
+				this.result = PING_RESULT.HOST_NOT_FOUND;
+			} else {
+				LOGGER.debug("socket>>maxWait:{}", maxWait);
+				socket = new Socket();
+				socket.connect(inetSocketAddress, maxWait);
+				if (socket.isConnected()) {
 					result = PING_RESULT.SUCCESS;
-				}else {
+				} else {
 					result = PING_RESULT.NOT_CONNECTED;
 				}
-			} else {
-				result = PING_RESULT.HOST_NOT_FOUND;
 			}
-		} catch (UnknownHostException e) {
-			result = PING_RESULT.HOST_NOT_FOUND;
-		} catch (IOException e) {
+			socket.close();
+		} catch (IOException ex) {
 			result = PING_RESULT.NOT_CONNECTED;
 		} finally {
-			if(socket!=null) {
+			if (socket != null) {
 				try {
 					socket.close();
 				} catch (IOException e) {
-					//Ignore.
+					// Ignore.
 				}
 			}
 		}
 	}
 
 	public static PING_RESULT ping(String host, int port, int maxWait) {
+		LOGGER.debug("host:{}, port:{}, maxWait:{}", host, port, maxWait);
 		PingTest pingTest = new PingTest(host, port, maxWait);
-		
+
 		Thread ping = new Thread(pingTest);
 		ping.setDaemon(true);
 		ping.start();
