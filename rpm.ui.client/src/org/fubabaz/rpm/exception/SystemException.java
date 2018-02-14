@@ -14,27 +14,20 @@
   * limitations under the License.
   */
 
-package org.fubabaz.rpm.ui.handler.menu;
-
-import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.ui.workbench.IWorkbench;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Shell;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.fubabaz.rpm.exception;
 
 /**
- * 
- * @author ej.park
+ * @author ejpark
  *
  */
-public class AboutHandler {
+public class SystemException extends RuntimeException {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AboutHandler.class);
-
-	@Execute
-	public void execute(IWorkbench workbench, Shell shell) {
-		LOGGER.debug("menu - about.");
-		MessageDialog.openInformation(shell, "About", "RPM - Realtime Performance Management");
-	}
+	/**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 413809336726619333L;
+	
+	public SystemException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -14,27 +14,17 @@
   * limitations under the License.
   */
 
-package org.fubabaz.rpm.ui.handler.menu;
-
-import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.ui.workbench.IWorkbench;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Shell;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.fubabaz.rpm.connection;
 
 /**
- * 
- * @author ej.park
+ * @author ejpark
  *
  */
-public class AboutHandler {
+public interface IConnectionData {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AboutHandler.class);
+	public String[] getConnectionNames();
 
-	@Execute
-	public void execute(IWorkbench workbench, Shell shell) {
-		LOGGER.debug("menu - about.");
-		MessageDialog.openInformation(shell, "About", "RPM - Realtime Performance Management");
-	}
+	public void addConnection(String connectionName, ConnectionInfo connectionInfo);
+	
+	public ConnectionInfo getConnection(String connectionName);
 }
