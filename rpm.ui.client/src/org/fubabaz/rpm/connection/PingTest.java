@@ -32,7 +32,7 @@ public class PingTest implements Runnable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PingTest.class);
 
 	public enum PING_RESULT {
-		SUCCESS, HOST_NOT_FOUND, NOT_CONNECTED, TIMEOUT;
+		SUCCESS, ADDRESS_UNRESOLVED, NOT_CONNECTED, TIMEOUT;
 	};
 
 	private String host;
@@ -44,7 +44,7 @@ public class PingTest implements Runnable {
 		this.host = host;
 		this.port = port;
 		this.maxWait = maxWait;
-		this.result = PING_RESULT.HOST_NOT_FOUND;
+		this.result = PING_RESULT.ADDRESS_UNRESOLVED;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class PingTest implements Runnable {
 			InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
 			if (inetSocketAddress.isUnresolved()) {
 				LOGGER.debug("inetSocketAddress>>isUnresolved:{}", inetSocketAddress.isUnresolved());
-				this.result = PING_RESULT.HOST_NOT_FOUND;
+				this.result = PING_RESULT.ADDRESS_UNRESOLVED;
 			} else {
 				LOGGER.debug("socket>>maxWait:{}", maxWait);
 				socket = new Socket();
