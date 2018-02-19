@@ -26,5 +26,7 @@ public interface IConnectionData {
 
 	public void addConnection(String connectionName, ConnectionInfo connectionInfo);
 	
+	public void removeConnection(String connectionName);
+
 	public ConnectionInfo getConnection(String connectionName);
 }

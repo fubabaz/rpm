@@ -17,6 +17,7 @@
 package org.fubabaz.rpm.ui.connection;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.crypto.spec.PBEKeySpec;
@@ -41,15 +42,16 @@ import com.google.gson.Gson;
 public class ConnectionStoredData implements IConnectionData {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionStoredData.class);
+	private static final String PREFERENCE_URL = "connection.list";
 	private ISecurePreferences connectionPreferences;
 	private Gson gson;
 
 	public ConnectionStoredData() {
 		HashMap<String, Object> options = new HashMap<String, Object>();
-		options.put(IProviderHints.DEFAULT_PASSWORD, new PBEKeySpec("connection".toCharArray()));
+		options.put(IProviderHints.DEFAULT_PASSWORD, new PBEKeySpec(PREFERENCE_URL.toCharArray()));
 		try {
 			LOGGER.debug("initialize.");
-			this.connectionPreferences = SecurePreferencesFactory.open(PreferenceStoredData.getPreferenceURL("connection.list"), options);
+			this.connectionPreferences = SecurePreferencesFactory.open(PreferenceStoredData.getPreferenceURL(PREFERENCE_URL), options);
 		} catch (IOException e) {
 			throw new SystemException(e);
 		}
@@ -59,10 +61,9 @@ public class ConnectionStoredData implements IConnectionData {
 	@Override
 	public void addConnection(String connectionName, ConnectionInfo connectionInfo) {
 		LOGGER.debug("addConnection:{}", connectionName);
-		ISecurePreferences preferences = this.connectionPreferences.node(connectionName);
 		try {
-			preferences.put("connectionInfo", getGsonData(connectionInfo), true);
-			preferences.flush();
+			this.connectionPreferences.put(connectionName, getGsonData(connectionInfo), true);
+			this.connectionPreferences.flush();
 		} catch (StorageException e) {
 			throw new SystemException(e);
 		} catch (IOException e) {
@@ -71,11 +72,15 @@ public class ConnectionStoredData implements IConnectionData {
 	}
 
 	@Override
+	public void removeConnection(String connectionName) {
+		this.connectionPreferences.remove(connectionName);
+	}
+
+	@Override
 	public ConnectionInfo getConnection(String connectionName) {
-		ISecurePreferences preferences = this.connectionPreferences.node(connectionName);
 		String connectionInfo = "";
 		try {
-			connectionInfo = preferences.get(connectionName, "");
+			connectionInfo = this.connectionPreferences.get(connectionName, "");
 		} catch (StorageException e) {
 			throw new SystemException(e);
 		}
@@ -84,7 +89,9 @@ public class ConnectionStoredData implements IConnectionData {
 
 	@Override
 	public String[] getConnectionNames() {
-		return this.connectionPreferences.keys();
+		String[] keys = this.connectionPreferences.keys();
+		Arrays.sort(keys);
+		return keys;
 	}
 
 	private String getGsonData(ConnectionInfo connectionInfo) {
