@@ -22,16 +22,20 @@ package org.fubabaz.rpm.connection;
  */
 public enum DbmsType {
 
-	ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver", new String[]{"jdbc:oracle:thin:@%s:%s:%s", "jdbc:oracle:thin:@//%s:%s/%s"}, 1521, "SID", "ServiceName"),
-	POSTGRESQL("PostgreSQL", "org.postgresql.Driver", new String[]{"jdbc:postgresql://%s:%s/%s"}, 5432, "DatabaseName"),
-	;
+	ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver",
+			new String[] { "jdbc:oracle:thin:@%s:%s:%s", "jdbc:oracle:thin:@//%s:%s/%s" }, 1521, "SID",
+			"ServiceName"), 
+	POSTGRESQL("PostgreSQL", "org.postgresql.Driver",
+					new String[] { "jdbc:postgresql://%s:%s/%s" }, 5432, "DatabaseName"),;
 
 	private String name;
 	private String driverClassName;
 	private String[] jdbcUrlFormat;
 	private int defaultPort;
 	private String[] databaseNames;
-	private DbmsType(String name, String driverClassName, String[] jdbcUrlFormat, int defaultPort, String... databaseNames) {
+
+	private DbmsType(String name, String driverClassName, String[] jdbcUrlFormat, int defaultPort,
+			String... databaseNames) {
 		this.name = name;
 		this.driverClassName = driverClassName;
 		this.jdbcUrlFormat = jdbcUrlFormat;
@@ -42,16 +46,29 @@ public enum DbmsType {
 	public String getName() {
 		return this.name;
 	}
+
 	public String getDriverClassName() {
 		return this.driverClassName;
 	}
+
 	public String getJdbcUrlFormat(int idx) {
 		return this.jdbcUrlFormat[idx];
 	}
+
 	public int getDefaultPort() {
 		return this.defaultPort;
 	}
+
 	public String[] getDatabaseNames() {
 		return this.databaseNames;
+	}
+
+	public static int getIndex(DbmsType dbmsType) {
+		for (int i = 0; i < DbmsType.values().length; i++) {
+			if (DbmsType.values()[i].equals(dbmsType)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

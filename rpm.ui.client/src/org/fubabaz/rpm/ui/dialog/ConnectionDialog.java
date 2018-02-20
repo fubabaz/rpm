@@ -22,6 +22,9 @@ import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeNodeContentProvider;
@@ -42,6 +45,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.fubabaz.rpm.connection.ConnectionInfo;
 import org.fubabaz.rpm.connection.DbmsType;
@@ -142,6 +146,25 @@ public class ConnectionDialog extends Dialog {
 		dbNameViewerColumn.getColumn().setAlignment(SWT.LEFT);
 		dbNameViewerColumn.getColumn().setText("Database");
 		dbNameViewerColumn.setLabelProvider(new TreeNodeColumnLabelProvider(3));
+
+		Button btn_delete = new Button(listComp, SWT.NONE);
+		btn_delete.setText("Delete");
+		btn_delete.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				TableItem[] selectedItems = connectionListViewer.getTable().getSelection();
+				for (TableItem selectedItem : selectedItems) {
+					String connectionName = selectedItem.getText(0);
+					connectionData.removeConnection(connectionName);
+				}
+				refreshConnectionList();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
 		Composite container = new Composite(area, SWT.NONE);
 		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -289,6 +312,34 @@ public class ConnectionDialog extends Dialog {
 
 		initConnectionList();
 
+		connectionListViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				StructuredSelection selection = (StructuredSelection) event.getSelection();
+				ConnectionInfoNode connectionInfoNode = (ConnectionInfoNode) selection.getFirstElement();
+				if (connectionInfoNode != null) {
+					String connectionName = String.valueOf(((Object[]) connectionInfoNode.getValue())[0]);
+					LOGGER.debug("connectionName:{}", connectionName);
+					ConnectionInfo connectionInfo = connectionData.getConnection(connectionName);
+					LOGGER.debug("connectionInfo:{}", connectionInfo.toString());
+					clearForm();
+
+					connctionName.setText(connectionName);
+					dbmsCls.select(DbmsType.getIndex(connectionInfo.getDbmsType()));
+					host.setText(connectionInfo.getHost());
+					port.setText(String.valueOf(connectionInfo.getPort()));
+					connectType.select(connectionInfo.getConnectType());
+					databaseName.setText(connectionInfo.getDatabaseName());
+					user.setText(connectionInfo.getUser());
+					if (connectionInfo.isSavePassword()) {
+						password.setText(connectionInfo.getPassword());
+						ckbtn_savePassword.setSelection(connectionInfo.isSavePassword());
+					}
+					jdbcOption.setText(connectionInfo.getJdbcOption());
+				}
+			}
+		});
 		return area;
 	}
 
@@ -297,11 +348,25 @@ public class ConnectionDialog extends Dialog {
 		initConnectionList();
 	}
 
+	private void clearForm() {
+		dbmsCls.clearSelection();
+		connctionName.setText("");
+		host.setText("");
+		port.setText("");
+		connectType.clearSelection();
+		databaseName.setText("");
+		user.setText("");
+		password.setText("");
+		ckbtn_savePassword.setSelection(false);
+		jdbcOption.setText("");
+	}
+
 	private void initConnectionList() {
 		String[] connectionNames = connectionData.getConnectionNames();
 		ConnectionInfoNode[] connectionNameNodes = new ConnectionInfoNode[connectionNames.length];
 		for (int i = 0; i < connectionNameNodes.length; i++) {
-			ConnectionInfoNode connectionNameNode = new ConnectionInfoNode(connectionNames[i], connectionData.getConnection(connectionNames[i]));
+			ConnectionInfoNode connectionNameNode = new ConnectionInfoNode(connectionNames[i],
+					connectionData.getConnection(connectionNames[i]));
 			connectionNameNodes[i] = connectionNameNode;
 		}
 		connectionListViewer.setInput(connectionNameNodes);
@@ -309,6 +374,8 @@ public class ConnectionDialog extends Dialog {
 
 	private void bindValues() {
 		DataBindingContext ctx = new DataBindingContext();
+		ctx.bindValue(WidgetProperties.singleSelectionIndex().observe(dbmsCls),
+				BeanProperties.value(ConnectionInfoBinder.class, "dbmsType").observe(connectionInfoBinder));
 		ctx.bindValue(WidgetProperties.text(SWT.Modify).observe(host),
 				BeanProperties.value(ConnectionInfoBinder.class, "host").observe(connectionInfoBinder));
 		ctx.bindValue(WidgetProperties.text(SWT.Modify).observe(port),
@@ -321,6 +388,8 @@ public class ConnectionDialog extends Dialog {
 				BeanProperties.value(ConnectionInfoBinder.class, "user").observe(connectionInfoBinder));
 		ctx.bindValue(WidgetProperties.text(SWT.Modify).observe(password),
 				BeanProperties.value(ConnectionInfoBinder.class, "password").observe(connectionInfoBinder));
+		ctx.bindValue(WidgetProperties.selection().observe(ckbtn_savePassword),
+				BeanProperties.value(ConnectionInfoBinder.class, "savePassword").observe(connectionInfoBinder));
 		ctx.bindValue(WidgetProperties.text(SWT.Modify).observe(jdbcOption),
 				BeanProperties.value(ConnectionInfoBinder.class, "jdbcOption").observe(connectionInfoBinder));
 	}
