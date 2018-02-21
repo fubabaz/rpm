@@ -154,12 +154,12 @@ public class ConnectionInfoBinder extends ModelPropertyChangeBinder {
 	}
 
 	/**
-	 * @param isSavePassword
-	 *            the isSavePassword to set
+	 * @param savePassword
+	 *            the savePassword to set
 	 */
-	public void setSavePassword(boolean isSavePassword) {
-		this.propertyChangeSupport.firePropertyChange("isSavePassword", isSavePassword(), isSavePassword);
-		this.connectionInfo.setSavePassword(isSavePassword);
+	public void setSavePassword(boolean savePassword) {
+		this.propertyChangeSupport.firePropertyChange("savePassword", isSavePassword(), savePassword);
+		this.connectionInfo.setSavePassword(savePassword);
 	}
 
 	/**

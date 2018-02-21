@@ -48,10 +48,13 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.fubabaz.rpm.connection.ConnectionInfo;
+import org.fubabaz.rpm.connection.ConnectionTest;
 import org.fubabaz.rpm.connection.DbmsType;
 import org.fubabaz.rpm.connection.IConnectionData;
 import org.fubabaz.rpm.connection.PingTest;
 import org.fubabaz.rpm.connection.PingTest.PING_RESULT;
+import org.fubabaz.rpm.connection.pool.ConnectionPoolFactory;
+import org.fubabaz.rpm.connection.pool.IConnectionInitializer;
 import org.fubabaz.rpm.ui.connection.ConnectionDataFactory;
 import org.fubabaz.rpm.ui.connection.ConnectionInfoBinder;
 import org.fubabaz.rpm.ui.connection.ConnectionInfoNode;
@@ -156,7 +159,7 @@ public class ConnectionDialog extends Dialog {
 				TableItem[] selectedItems = connectionListViewer.getTable().getSelection();
 				for (TableItem selectedItem : selectedItems) {
 					String connectionName = selectedItem.getText(0);
-					connectionData.removeConnection(connectionName);
+					connectionData.removeConnectionInfo(connectionName);
 				}
 				refreshConnectionList();
 			}
@@ -321,8 +324,9 @@ public class ConnectionDialog extends Dialog {
 				if (connectionInfoNode != null) {
 					String connectionName = String.valueOf(((Object[]) connectionInfoNode.getValue())[0]);
 					LOGGER.debug("connectionName:{}", connectionName);
-					ConnectionInfo connectionInfo = connectionData.getConnection(connectionName);
+					ConnectionInfo connectionInfo = connectionData.getConnectionInfo(connectionName);
 					LOGGER.debug("connectionInfo:{}", connectionInfo.toString());
+
 					clearForm();
 
 					connctionName.setText(connectionName);
@@ -335,8 +339,12 @@ public class ConnectionDialog extends Dialog {
 					if (connectionInfo.isSavePassword()) {
 						password.setText(connectionInfo.getPassword());
 						ckbtn_savePassword.setSelection(connectionInfo.isSavePassword());
+						// CheckBox non-event value set binding is not working.
+						connectionInfoBinder.setSavePassword(connectionInfo.isSavePassword());
 					}
 					jdbcOption.setText(connectionInfo.getJdbcOption());
+					
+					LOGGER.debug("binding connectionInfo:{}", connectionInfoBinder.getConnectionInfo());
 				}
 			}
 		});
@@ -366,7 +374,7 @@ public class ConnectionDialog extends Dialog {
 		ConnectionInfoNode[] connectionNameNodes = new ConnectionInfoNode[connectionNames.length];
 		for (int i = 0; i < connectionNameNodes.length; i++) {
 			ConnectionInfoNode connectionNameNode = new ConnectionInfoNode(connectionNames[i],
-					connectionData.getConnection(connectionNames[i]));
+					connectionData.getConnectionInfo(connectionNames[i]));
 			connectionNameNodes[i] = connectionNameNode;
 		}
 		connectionListViewer.setInput(connectionNameNodes);
@@ -428,25 +436,34 @@ public class ConnectionDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		super.okPressed();
+		ConnectionTest.test(connectionInfoBinder.getConnectionInfo());
+		if (connectionInfoBinder.getConnectionInfo().isValid()) {
+			IConnectionInitializer connectionInitializer = (IConnectionInitializer) ConnectionPoolFactory.getInstance()
+					.getConnectionPool();
+			connectionInitializer.initialize(connectionInfoBinder.getConnectionInfo());
+			super.okPressed();
+		} else {
+			MessageDialog.open(MessageDialog.WARNING, getShell(), "Check", connectionInfoBinder.getConnectionInfo().getMessage(), SWT.NONE);
+		}
 	}
 
 	private void connectionTest() {
 		LOGGER.debug("connectionInfoBinder:{}", connectionInfoBinder.toString());
+
 		if (isValidConnectMandatoy() && isValidNetwork()) {
-			// CONNECT_RESULT result = connectionPool.connectionTest(dbmsType,
-			// connectionInfoBinder.getConnectionInfo());
-			// if (CONNECT_RESULT.CONNECTED == result) {
-			//
-			// } else {
-			//
-			// }
+			ConnectionTest.test(connectionInfoBinder.getConnectionInfo());
+			if (connectionInfoBinder.getConnectionInfo().isValid()) {
+				connectionInfoBinder.getConnectionInfo().setValid(false);
+				MessageDialog.open(MessageDialog.INFORMATION, getShell(), "Information", "Success.", SWT.NONE);
+			} else {
+				MessageDialog.open(MessageDialog.WARNING, getShell(), "Check", connectionInfoBinder.getConnectionInfo().getMessage(), SWT.NONE);
+			}
 		}
 	}
 
 	private void saveConnectionData() {
 		if (isValidSave()) {
-			connectionData.addConnection(connctionName.getText(), connectionInfoBinder.getConnectionInfo());
+			connectionData.addConnectionInfo(connctionName.getText(), connectionInfoBinder.getConnectionInfo());
 			refreshConnectionList();
 		}
 	}

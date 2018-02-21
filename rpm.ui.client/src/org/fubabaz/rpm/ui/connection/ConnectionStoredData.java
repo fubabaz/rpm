@@ -59,7 +59,7 @@ public class ConnectionStoredData implements IConnectionData {
 	}
 
 	@Override
-	public void addConnection(String connectionName, ConnectionInfo connectionInfo) {
+	public void addConnectionInfo(String connectionName, ConnectionInfo connectionInfo) {
 		LOGGER.debug("addConnection:{}", connectionName);
 		try {
 			this.connectionPreferences.put(connectionName, getGsonData(connectionInfo), true);
@@ -72,19 +72,19 @@ public class ConnectionStoredData implements IConnectionData {
 	}
 
 	@Override
-	public void removeConnection(String connectionName) {
+	public void removeConnectionInfo(String connectionName) {
 		this.connectionPreferences.remove(connectionName);
 	}
 
 	@Override
-	public ConnectionInfo getConnection(String connectionName) {
-		String connectionInfo = "";
+	public ConnectionInfo getConnectionInfo(String connectionName) {
+		String connectionInfoJson = "";
 		try {
-			connectionInfo = this.connectionPreferences.get(connectionName, "");
+			connectionInfoJson = this.connectionPreferences.get(connectionName, "");
 		} catch (StorageException e) {
 			throw new SystemException(e);
 		}
-		return getConnectionInfo(connectionInfo);
+		return getConnectionInfoFromJson(connectionInfoJson);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class ConnectionStoredData implements IConnectionData {
 		return this.gson.toJson(connectionInfo);
 	}
 
-	private ConnectionInfo getConnectionInfo(String connectionInfo) {
-		return this.gson.fromJson(connectionInfo, ConnectionInfo.class);
+	private ConnectionInfo getConnectionInfoFromJson(String connectionInfoJson) {
+		return this.gson.fromJson(connectionInfoJson, ConnectionInfo.class);
 	}
 }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="rpm.ui.client" id="rpm.ui.client.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
+<product name="rpm.ui.client" uid="rpm.ui.client" id="rpm.ui.client.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
+
 
    <configIni use="default">
    </configIni>
@@ -14,6 +15,17 @@
    </launcherArgs>
 
    <windowImages/>
+
+   <launcher>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+
+   <vm>
+   </vm>
+
 
    <plugins>
       <plugin id="ch.qos.logback.classic"/>
@@ -95,5 +107,12 @@
       <plugin id="rpm.ui.client"/>
    </plugins>
 
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
 
 </product>

@@ -33,5 +33,4 @@ public class ConnectionHandler {
 		dialog.create();
 		dialog.open();
 	}
-
 }

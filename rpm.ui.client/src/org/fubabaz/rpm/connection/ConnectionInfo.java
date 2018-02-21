@@ -31,9 +31,12 @@ public class ConnectionInfo {
 	private String databaseName;
 	private String user;
 	private String password;
-	private boolean isSavePassword = false;
+	private boolean savePassword;
 	private String jdbcOption;
 	private final Properties options;
+
+	private boolean isValid;
+	private String message;
 
 	public ConnectionInfo() {
 		this.options = new Properties();
@@ -145,18 +148,18 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @return the isSavePassword
+	 * @return the savePassword
 	 */
 	public boolean isSavePassword() {
-		return isSavePassword;
+		return savePassword;
 	}
 
 	/**
-	 * @param isSavePassword
-	 *            the isSavePassword to set
+	 * @param savePassword
+	 *            the savePassword to set
 	 */
-	public void setSavePassword(boolean isSavePassword) {
-		this.isSavePassword = isSavePassword;
+	public void setSavePassword(boolean savePassword) {
+		this.savePassword = savePassword;
 	}
 
 	/**
@@ -196,8 +199,39 @@ public class ConnectionInfo {
 		this.options.put(key, value);
 	}
 
-	public String getJdbcUrl(DbmsType dbmsType) {
+	/**
+	 * @return the jdbcUrl
+	 */
+	public String getJdbcUrl() {
 		return String.format(dbmsType.getJdbcUrlFormat(connectType), host, port, databaseName);
+	}
+
+	/**
+	 * @return the isValid
+	 */
+	public boolean isValid() {
+		return isValid;
+	}
+
+	/**
+	 * @param isValid the isValid to set
+	 */
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
+	}
+
+	/**
+	 * @return the message
+	 */
+	public String getMessage() {
+		return message;
+	}
+
+	/**
+	 * @param message the message to set
+	 */
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	/*
@@ -222,8 +256,8 @@ public class ConnectionInfo {
 		sb.append(this.user);
 		sb.append(", password=");
 		sb.append(this.password);
-		sb.append(", isSavePassword=");
-		sb.append(this.isSavePassword);
+		sb.append(", savePassword=");
+		sb.append(this.savePassword);
 		sb.append(", jdbcOption=");
 		sb.append(this.jdbcOption);
 		sb.append(", options=");

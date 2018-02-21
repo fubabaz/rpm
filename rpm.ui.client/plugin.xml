@@ -13,10 +13,6 @@
                value="bundleclass://org.fubabaz.rpm.ui.client/rpm.ui.client.E4LifeCycle">
          </property>
          <property
-               name="applicationCSS"
-               value="platform:/plugin/rpm.ui.client/css/default.css">
-         </property>
-         <property
                name="appName"
                value="rpm.ui.client">
          </property>

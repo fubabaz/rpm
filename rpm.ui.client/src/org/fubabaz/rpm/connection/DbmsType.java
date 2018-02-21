@@ -23,23 +23,24 @@ package org.fubabaz.rpm.connection;
 public enum DbmsType {
 
 	ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver",
-			new String[] { "jdbc:oracle:thin:@%s:%s:%s", "jdbc:oracle:thin:@//%s:%s/%s" }, 1521, "SID",
-			"ServiceName"), 
-	POSTGRESQL("PostgreSQL", "org.postgresql.Driver",
-					new String[] { "jdbc:postgresql://%s:%s/%s" }, 5432, "DatabaseName"),;
+			new String[] { "jdbc:oracle:thin:@%s:%s:%s", "jdbc:oracle:thin:@//%s:%s/%s" }, 1521, "select 1 from dual", "SID",
+			"ServiceName"), POSTGRESQL("PostgreSQL", "org.postgresql.Driver",
+					new String[] { "jdbc:postgresql://%s:%s/%s" }, 5432, "select 1 ", "DatabaseName"),;
 
 	private String name;
 	private String driverClassName;
 	private String[] jdbcUrlFormat;
 	private int defaultPort;
+	private String validationQuery;
 	private String[] databaseNames;
 
 	private DbmsType(String name, String driverClassName, String[] jdbcUrlFormat, int defaultPort,
-			String... databaseNames) {
+			String validationQuery, String... databaseNames) {
 		this.name = name;
 		this.driverClassName = driverClassName;
 		this.jdbcUrlFormat = jdbcUrlFormat;
 		this.defaultPort = defaultPort;
+		this.validationQuery = validationQuery;
 		this.databaseNames = databaseNames;
 	}
 
@@ -59,6 +60,10 @@ public enum DbmsType {
 		return this.defaultPort;
 	}
 
+	public String getValidationQuery() {
+		return this.validationQuery;
+	}
+	
 	public String[] getDatabaseNames() {
 		return this.databaseNames;
 	}
