@@ -22,6 +22,14 @@
 		</repository>
 	</distributionManagement>
 
+	<repositories>
+		<repository>
+			<id>oracle</id>
+			<name>ORACLE JDBC Repository</name>
+			<url>http://maven.jahia.org/maven2</url>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -78,9 +86,9 @@
 			<version>42.1.4</version>
 		</dependency>
 		<dependency>
-			<groupId>com.jslsolucoes</groupId>
+			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.1.0</version>
+			<version>12.1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
