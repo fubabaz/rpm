@@ -46,7 +46,7 @@ public class ConnectionInfoBinder extends ModelPropertyChangeBinder {
 	 */
 	public void setDbmsType(int dbmsCls) {
 		DbmsType dbmsType = DbmsType.values()[dbmsCls];
-		this.propertyChangeSupport.firePropertyChange("dbmsCls", getDbmsType(), dbmsType);
+		this.propertyChangeSupport.firePropertyChange("dbmsType", getDbmsType(), dbmsType);
 		this.connectionInfo.setDbmsType(dbmsType);
 	}
 

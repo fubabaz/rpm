@@ -339,10 +339,13 @@ public class ConnectionDialog extends Dialog {
 					if (connectionInfo.isSavePassword()) {
 						password.setText(connectionInfo.getPassword());
 						ckbtn_savePassword.setSelection(connectionInfo.isSavePassword());
-						// CheckBox non-event value set binding is not working.
-						connectionInfoBinder.setSavePassword(connectionInfo.isSavePassword());
 					}
 					jdbcOption.setText(connectionInfo.getJdbcOption());
+					
+					// Object non-event value set binding is not working.
+					connectionInfoBinder.setDbmsType(DbmsType.getIndex(connectionInfo.getDbmsType()));
+					connectionInfoBinder.setConnectType(connectionInfo.getConnectType());
+					connectionInfoBinder.setSavePassword(connectionInfo.isSavePassword());
 					
 					LOGGER.debug("binding connectionInfo:{}", connectionInfoBinder.getConnectionInfo());
 				}
