@@ -20,28 +20,28 @@ package org.fubabaz.rpm.service;
  * @author ejpark
  *
  */
-public class SqlServiceManagerFactory {
+public class ServiceManagerFactory {
 
 	/** instance */
-	private volatile static SqlServiceManagerFactory instance;
-	private SqlServiceManager sqlServiceManager;
+	private volatile static ServiceManagerFactory instance;
+	private ExecuteServiceManager executeServiceManager;
 
-	public static SqlServiceManagerFactory getInstance() {
-		synchronized (SqlServiceManagerFactory.class) {
+	public static ServiceManagerFactory getInstance() {
+		synchronized (ServiceManagerFactory.class) {
 			if (instance == null) {
-				instance = new SqlServiceManagerFactory();
+				instance = new ServiceManagerFactory();
 			}
 		}
 		return instance;
 	}
 
-	private SqlServiceManagerFactory() {
+	private ServiceManagerFactory() {
 	}
 
-	public SqlServiceManager getServiceManager() {
-		if (this.sqlServiceManager == null) {
-			this.sqlServiceManager = new SqlServiceManager();
+	public ExecuteServiceManager getServiceManager() {
+		if (this.executeServiceManager == null) {
+			this.executeServiceManager = new ExecuteServiceManager();
 		}
-		return this.sqlServiceManager;
+		return this.executeServiceManager;
 	}
 }

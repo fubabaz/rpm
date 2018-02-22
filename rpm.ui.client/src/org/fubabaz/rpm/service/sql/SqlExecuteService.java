@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author ejpark
  *
  */
-public class SqlExecuteService extends Thread {
+public class SqlExecuteService implements Runnable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SqlExecuteService.class);
 

@@ -33,9 +33,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.fubabaz.rpm.service.IServiceCallback;
-import org.fubabaz.rpm.service.SqlServiceManager;
-import org.fubabaz.rpm.service.SqlServiceManagerFactory;
+import org.fubabaz.rpm.service.ExecuteServiceManager;
+import org.fubabaz.rpm.service.ServiceManagerFactory;
 import org.fubabaz.rpm.service.sql.ColumnMetaInfo;
+import org.fubabaz.rpm.service.sql.SqlExecuteService;
 import org.fubabaz.rpm.service.sql.SqlResultInfo;
 import org.fubabaz.rpm.ui.tree.TreeNodeColumnLabelProvider;
 import org.slf4j.Logger;
@@ -82,8 +83,8 @@ public class TestView {
 					for (int i = table.getColumnCount() - 1; i >= 0; i--) {
 						table.getColumn(i).dispose();
 					}
-					SqlServiceManager sqlServiceManager = SqlServiceManagerFactory.getInstance().getServiceManager();
-					sqlServiceManager.start(text.getText(), new IServiceCallback() {
+					ExecuteServiceManager executeServiceManager = ServiceManagerFactory.getInstance().getServiceManager();
+					executeServiceManager.execute(new SqlExecuteService(text.getText(), new IServiceCallback() {
 
 						@Override
 						public void failed(Throwable exc, Object attachment) {
@@ -122,7 +123,7 @@ public class TestView {
 
 							});
 						}
-					});
+					}));
 				}
 			}
 		});

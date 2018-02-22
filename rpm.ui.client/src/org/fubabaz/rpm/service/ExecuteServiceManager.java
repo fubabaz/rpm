@@ -16,13 +16,11 @@
 
 package org.fubabaz.rpm.service;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.fubabaz.rpm.service.sql.SqlExecuteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,29 +28,21 @@ import org.slf4j.LoggerFactory;
  * @author ejpark
  *
  */
-public class SqlServiceManager {
+public class ExecuteServiceManager {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SqlServiceManager.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteServiceManager.class);
 	private final ExecutorService executorService;
 
-	public SqlServiceManager() {
+	public ExecuteServiceManager() {
 		int theadCnt = Runtime.getRuntime().availableProcessors();
 		LOGGER.debug("availableProcessors:{}", theadCnt);
 		this.executorService = Executors.newFixedThreadPool(theadCnt);
 	}
 
-	public void start(String sql, IServiceCallback serviceCallback) {
-		SqlExecuteService service = new SqlExecuteService(sql, serviceCallback);
-		LOGGER.debug("submit:{}", sql);
+	public Future<?> execute(Runnable service) {
 		Future<?> future = this.executorService.submit(service);
 		status();
-		try {
-			future.get();
-		} catch (InterruptedException e) {
-			serviceCallback.failed(e, sql);
-		} catch (ExecutionException e) {
-			serviceCallback.failed(e, sql);
-		}
+		return future;
 	}
 
 	public void finish() {
