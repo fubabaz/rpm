@@ -40,11 +40,14 @@ public class SqlExecuteService implements Runnable {
 	private IConnectionPool connectionPool;
 	private String sql;
 	private IServiceCallback serviceCallback;
-	
-	public SqlExecuteService(String sql, IServiceCallback serviceCallback) {
+
+	public SqlExecuteService(IServiceCallback serviceCallback) {
 		this.connectionPool = ConnectionPoolFactory.getInstance().getConnectionPool();
-		this.sql = sql;
 		this.serviceCallback = serviceCallback;
+	}
+
+	public void setSql(String sql) {
+		this.sql = sql;
 	}
 
 	@Override
@@ -54,33 +57,36 @@ public class SqlExecuteService implements Runnable {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		try {
-			SqlResultInfo sqlResultInfo = new SqlResultInfo();
-			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_UPDATABLE);
 			resultSet = preparedStatement.executeQuery();
 			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 			int columnCnt = resultSetMetaData.getColumnCount();
-			LOGGER.debug("columnCnt:{}", columnCnt);
+			resultSet.last();
+			int totalRow = resultSet.getRow();
+			resultSet.beforeFirst();
+			SqlResultInfo sqlResultInfo = new SqlResultInfo(totalRow);
+			LOGGER.debug("columnCnt:{}, totalRow:{}", columnCnt, totalRow);
 			for (int i = 0; i < columnCnt; i++) {
 				ColumnMetaInfo columnMetaInfo = new ColumnMetaInfo();
-				columnMetaInfo.setLabel(resultSetMetaData.getColumnLabel(i+1));
-				columnMetaInfo.setWidth(resultSetMetaData.getColumnDisplaySize(i+1));
+				columnMetaInfo.setLabel(resultSetMetaData.getColumnLabel(i + 1));
+				columnMetaInfo.setWidth(resultSetMetaData.getColumnDisplaySize(i + 1));
 				sqlResultInfo.addColumnMetaInfo(columnMetaInfo);
 			}
 			try {
 				while (resultSet.next()) {
-					int totalRows = resultSet.getMetaData().getColumnCount();
-					Object[] row = new Object[totalRows];
-					for (int i = 0; i < totalRows; i++) {
+					Object[] row = new Object[columnCnt];
+					for (int i = 0; i < columnCnt; i++) {
 						row[i] = resultSet.getObject(i + 1);
-						sqlResultInfo.addRow(row);
 					}
+					sqlResultInfo.addRow(resultSet.getRow() - 1, row);
 				}
 			} catch (SQLException e) {
 				throw new SystemException(e);
 			}
-			serviceCallback.completed(sqlResultInfo, null);
+			serviceCallback.success(sqlResultInfo, sql);
 		} catch (SQLException e) {
-			serviceCallback.failed(e, sql);
+			serviceCallback.error(e, sql);
 		} finally {
 			try {
 				if (preparedStatement != null) {

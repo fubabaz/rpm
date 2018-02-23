@@ -16,12 +16,14 @@
 
 package org.fubabaz.rpm.service;
 
-import java.nio.channels.CompletionHandler;
-
 /**
  * @author ejpark
  *
  */
-public interface IServiceCallback extends CompletionHandler<Object, Object> {
-	
+public interface IServiceCallback {
+
+	public void success(Object result, String attachement);
+
+	public void error(Throwable exception, String attachment);
+
 }

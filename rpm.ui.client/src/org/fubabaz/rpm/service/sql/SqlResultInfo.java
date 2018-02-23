@@ -26,8 +26,11 @@ import java.util.List;
 public class SqlResultInfo {
 
 	private List<ColumnMetaInfo> columnMetaInfoList = new ArrayList<ColumnMetaInfo>();
-	private List<Object[]> dataList = new ArrayList<Object[]>();
+	private Object[] rows;
 
+	public SqlResultInfo(int rowCnt) {
+		rows = new Object[rowCnt];
+	}
 	public List<ColumnMetaInfo> getColumnMetaInfoList() {
 		return columnMetaInfoList;
 	}
@@ -36,11 +39,11 @@ public class SqlResultInfo {
 		this.columnMetaInfoList.add(columnMetaInfo);
 	} 
 
-	public List<Object[]> getDataList() {
-		return dataList;
+	public Object[] getRowData() {
+		return rows;
 	}
 
-	public void addRow(Object[] row) {
-		this.dataList.add(row);
+	public void addRow(int index, Object[] row) {
+		this.rows[index] = row;
 	} 
 }

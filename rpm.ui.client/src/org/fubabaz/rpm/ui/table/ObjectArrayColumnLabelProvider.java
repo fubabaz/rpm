@@ -14,18 +14,29 @@
   * limitations under the License.
   */
 
-package org.fubabaz.rpm.ui.part;
+package org.fubabaz.rpm.ui.table;
 
-import org.eclipse.jface.viewers.TreeNode;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 
 /**
  * @author ejpark
  *
  */
-public class ResultRowNode extends TreeNode {
+public class ObjectArrayColumnLabelProvider extends ColumnLabelProvider {
 
-	public ResultRowNode(Object[] value) {
-		super(value);
+	private final int columnIndex;
+
+	public ObjectArrayColumnLabelProvider(int columnIndex) {
+		this.columnIndex = columnIndex;
 	}
 
+	@Override
+	public String getText(Object element) {
+		Object object = null;
+		if(element instanceof Object[]) {
+			Object[] rows = (Object[])element;
+			object = rows[columnIndex];
+		}
+		return object == null ? "" : object.toString();//$NON-NLS-1$
+	}
 }

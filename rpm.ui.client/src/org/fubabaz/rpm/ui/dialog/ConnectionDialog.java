@@ -22,12 +22,12 @@ import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TreeNodeContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -57,9 +57,8 @@ import org.fubabaz.rpm.connection.pool.ConnectionPoolFactory;
 import org.fubabaz.rpm.connection.pool.IConnectionInitializer;
 import org.fubabaz.rpm.ui.connection.ConnectionDataFactory;
 import org.fubabaz.rpm.ui.connection.ConnectionInfoBinder;
-import org.fubabaz.rpm.ui.connection.ConnectionInfoNode;
 import org.fubabaz.rpm.ui.connection.PortVerifyListener;
-import org.fubabaz.rpm.ui.tree.TreeNodeColumnLabelProvider;
+import org.fubabaz.rpm.ui.table.ObjectArrayColumnLabelProvider;
 import org.fubabaz.rpm.ui.util.ImagePath;
 import org.fubabaz.rpm.ui.util.ResourceUtil;
 import org.slf4j.Logger;
@@ -122,7 +121,7 @@ public class ConnectionDialog extends Dialog {
 		connectionListViewer = new TableViewer(listComp);
 		Table table = connectionListViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		connectionListViewer.setContentProvider(new TreeNodeContentProvider());
+		connectionListViewer.setContentProvider(new ArrayContentProvider());
 		connectionListViewer.getTable().setHeaderVisible(true);
 		connectionListViewer.getTable().setLinesVisible(true);
 
@@ -130,25 +129,25 @@ public class ConnectionDialog extends Dialog {
 		dpNameViewerColumn.getColumn().setWidth(80);
 		dpNameViewerColumn.getColumn().setAlignment(SWT.LEFT);
 		dpNameViewerColumn.getColumn().setText("Name");
-		dpNameViewerColumn.setLabelProvider(new TreeNodeColumnLabelProvider(0));
+		dpNameViewerColumn.setLabelProvider(new ObjectArrayColumnLabelProvider(0));
 
 		TableViewerColumn hostViewerColumn = new TableViewerColumn(this.connectionListViewer, SWT.NONE);
 		hostViewerColumn.getColumn().setWidth(140);
 		hostViewerColumn.getColumn().setAlignment(SWT.LEFT);
 		hostViewerColumn.getColumn().setText("Host");
-		hostViewerColumn.setLabelProvider(new TreeNodeColumnLabelProvider(1));
+		hostViewerColumn.setLabelProvider(new ObjectArrayColumnLabelProvider(1));
 
 		TableViewerColumn portViewerColumn = new TableViewerColumn(this.connectionListViewer, SWT.NONE);
 		portViewerColumn.getColumn().setWidth(60);
 		portViewerColumn.getColumn().setAlignment(SWT.LEFT);
 		portViewerColumn.getColumn().setText("Port");
-		portViewerColumn.setLabelProvider(new TreeNodeColumnLabelProvider(2));
+		portViewerColumn.setLabelProvider(new ObjectArrayColumnLabelProvider(2));
 
 		TableViewerColumn dbNameViewerColumn = new TableViewerColumn(this.connectionListViewer, SWT.NONE);
 		dbNameViewerColumn.getColumn().setWidth(60);
 		dbNameViewerColumn.getColumn().setAlignment(SWT.LEFT);
 		dbNameViewerColumn.getColumn().setText("Database");
-		dbNameViewerColumn.setLabelProvider(new TreeNodeColumnLabelProvider(3));
+		dbNameViewerColumn.setLabelProvider(new ObjectArrayColumnLabelProvider(3));
 
 		Button btn_delete = new Button(listComp, SWT.NONE);
 		btn_delete.setText("Delete");
@@ -320,9 +319,9 @@ public class ConnectionDialog extends Dialog {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				StructuredSelection selection = (StructuredSelection) event.getSelection();
-				ConnectionInfoNode connectionInfoNode = (ConnectionInfoNode) selection.getFirstElement();
-				if (connectionInfoNode != null) {
-					String connectionName = String.valueOf(((Object[]) connectionInfoNode.getValue())[0]);
+				Object[] connectionObject = (Object[]) selection.getFirstElement();
+				if (connectionObject != null) {
+					String connectionName = String.valueOf(connectionObject[0]);
 					LOGGER.debug("connectionName:{}", connectionName);
 					ConnectionInfo connectionInfo = connectionData.getConnectionInfo(connectionName);
 					LOGGER.debug("connectionInfo:{}", connectionInfo.toString());
@@ -341,12 +340,12 @@ public class ConnectionDialog extends Dialog {
 						ckbtn_savePassword.setSelection(connectionInfo.isSavePassword());
 					}
 					jdbcOption.setText(connectionInfo.getJdbcOption());
-					
+
 					// Object non-event value set binding is not working.
 					connectionInfoBinder.setDbmsType(DbmsType.getIndex(connectionInfo.getDbmsType()));
 					connectionInfoBinder.setConnectType(connectionInfo.getConnectType());
 					connectionInfoBinder.setSavePassword(connectionInfo.isSavePassword());
-					
+
 					LOGGER.debug("binding connectionInfo:{}", connectionInfoBinder.getConnectionInfo());
 				}
 			}
@@ -374,10 +373,11 @@ public class ConnectionDialog extends Dialog {
 
 	private void initConnectionList() {
 		String[] connectionNames = connectionData.getConnectionNames();
-		ConnectionInfoNode[] connectionNameNodes = new ConnectionInfoNode[connectionNames.length];
+		Object[] connectionNameNodes = new Object[connectionNames.length];
 		for (int i = 0; i < connectionNameNodes.length; i++) {
-			ConnectionInfoNode connectionNameNode = new ConnectionInfoNode(connectionNames[i],
-					connectionData.getConnectionInfo(connectionNames[i]));
+			ConnectionInfo connectionInfo = connectionData.getConnectionInfo(connectionNames[i]);
+			Object[] connectionNameNode = { connectionNames[i], connectionInfo.getHost(), connectionInfo.getPort(),
+					connectionInfo.getDatabaseName() };
 			connectionNameNodes[i] = connectionNameNode;
 		}
 		connectionListViewer.setInput(connectionNameNodes);
@@ -446,7 +446,8 @@ public class ConnectionDialog extends Dialog {
 			connectionInitializer.initialize(connectionInfoBinder.getConnectionInfo());
 			super.okPressed();
 		} else {
-			MessageDialog.open(MessageDialog.WARNING, getShell(), "Check", connectionInfoBinder.getConnectionInfo().getMessage(), SWT.NONE);
+			MessageDialog.open(MessageDialog.WARNING, getShell(), "Check",
+					connectionInfoBinder.getConnectionInfo().getMessage(), SWT.NONE);
 		}
 	}
 
@@ -459,7 +460,8 @@ public class ConnectionDialog extends Dialog {
 				connectionInfoBinder.getConnectionInfo().setValid(false);
 				MessageDialog.open(MessageDialog.INFORMATION, getShell(), "Information", "Success.", SWT.NONE);
 			} else {
-				MessageDialog.open(MessageDialog.WARNING, getShell(), "Check", connectionInfoBinder.getConnectionInfo().getMessage(), SWT.NONE);
+				MessageDialog.open(MessageDialog.WARNING, getShell(), "Check",
+						connectionInfoBinder.getConnectionInfo().getMessage(), SWT.NONE);
 			}
 		}
 	}
