@@ -17,7 +17,6 @@
 
    <windowImages/>
 
-
    <launcher>
       <win useIco="false">
          <bmp/>
@@ -26,7 +25,6 @@
 
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="ch.qos.logback.classic"/>
@@ -108,6 +106,14 @@
       <plugin id="rpm.ui.client"/>
    </plugins>
 
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+      <plugin id="rpm.ui.client" autoStart="false" startLevel="0" />
+   </configurations>
 
    <preferencesInfo>
       <targetfile overwrite="false"/>

@@ -26,9 +26,12 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.fubabaz.rpm.service.sql.ColumnMetaInfo;
@@ -46,6 +49,7 @@ public class TestView extends SqlServiceView {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestView.class);
 	private Text text;
 	private TableViewer tableViewer;
+	private SqlResultInfo sqlResultInfo;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -65,36 +69,46 @@ public class TestView extends SqlServiceView {
 		tableViewer.getTable().setHeaderVisible(true);
 		tableViewer.getTable().setLinesVisible(true);
 
-		text.setText("select * from v$session");
+		text.setText("select * from v$sql");
 		text.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.stateMask == SWT.CTRL && (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR)) {
 					e.doit = false;
-					executeSql(text.getText());
+					executeSql(text.getText(), 100);
+				}
+			}
+		});
+
+		ScrollBar scrollBar = tableViewer.getTable().getVerticalBar();
+		scrollBar.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (scrollBar.getSelection() + scrollBar.getThumb() == scrollBar.getMaximum()) {
+					sqlResultInfo.fetchRows();
 				}
 			}
 		});
 	}
 
 	@Override
-	public void callback(Object result, String attachement) {
-		LOGGER.debug("redraw:{}", result);
-		tableViewer.getControl().getDisplay().asyncExec(new Runnable() {
+	public void start_callback(Object result, String attachement) {
+		LOGGER.debug("start:{}", result);
 
-			@Override
-			public void run() {
-				removeTableColumns();
+		removeTableColumns();
 
-				SqlResultInfo sqlResultInfo = (SqlResultInfo) result;
-				List<ColumnMetaInfo> columnMetaInfoList = sqlResultInfo.getColumnMetaInfoList();
+		sqlResultInfo = (SqlResultInfo) result;
+		createTalbeColumns(sqlResultInfo.getColumnMetaInfoList());
 
-				createTalbeColumns(columnMetaInfoList);
+		tableViewer.add(sqlResultInfo.getRowData());
+	}
 
-				Object[] rowData = sqlResultInfo.getRowData();
-				tableViewer.setInput(rowData);
-			}
-		});
+	@Override
+	public void process_callback(Object result, String attachement) {
+		LOGGER.debug("process:{}", result);
+
+		sqlResultInfo = (SqlResultInfo) result;
+		tableViewer.add(sqlResultInfo.getRowData());
 	}
 
 	private void removeTableColumns() {

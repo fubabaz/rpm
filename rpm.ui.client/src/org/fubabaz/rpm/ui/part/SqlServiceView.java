@@ -16,6 +16,9 @@
 
 package org.fubabaz.rpm.ui.part;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.fubabaz.rpm.service.ExecuteServiceManager;
 import org.fubabaz.rpm.service.IServiceCallback;
 import org.fubabaz.rpm.service.ServiceManagerFactory;
@@ -33,20 +36,53 @@ public abstract class SqlServiceView implements IServiceCallback {
 	private ExecuteServiceManager executeServiceManager;
 	private SqlExecuteService sqlExecuteService;
 
+	@Inject
+	private UISynchronize uiSync;
+
 	protected SqlServiceView() {
 		this.executeServiceManager = ServiceManagerFactory.getInstance().getServiceManager();
 		this.sqlExecuteService = new SqlExecuteService(this);
 	}
 
-	protected void executeSql(String sql) {
-		this.sqlExecuteService.setSql(sql);
+	protected void executeSql(String sql, int fetchSize) {
+		this.sqlExecuteService.setSql(sql, fetchSize);
 		this.executeServiceManager.execute(this.sqlExecuteService);
 	}
 
 	@Override
-	public void success(Object result, String attachement) {
-		LOGGER.debug("success:{}", result);
-		callback(result, attachement);
+	public void start(Object result, String attachement) {
+		LOGGER.debug("start:{}", result);
+		uiSync.asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				start_callback(result, attachement);
+			}
+		});
+	}
+
+	@Override
+	public void process(Object result, String attachement) {
+		LOGGER.debug("process:{}", result);
+		uiSync.asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				process_callback(result, attachement);
+			}
+		});
+	}
+
+	@Override
+	public void end(Object result, String attachement) {
+		LOGGER.debug("end:{}", result);
+		uiSync.asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				end_callback(result, attachement);
+			}
+		});
 	}
 
 	@Override
@@ -54,5 +90,7 @@ public abstract class SqlServiceView implements IServiceCallback {
 		LOGGER.error(attachment, exception);
 	}
 
-	public abstract void callback(Object result, String attachement);
+	public void start_callback(Object result, String attachement) {};
+	public void process_callback(Object result, String attachement) {};
+	public void end_callback(Object result, String attachement) {}
 }

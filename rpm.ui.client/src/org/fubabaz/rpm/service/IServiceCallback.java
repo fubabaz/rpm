@@ -22,7 +22,11 @@ package org.fubabaz.rpm.service;
  */
 public interface IServiceCallback {
 
-	public void success(Object result, String attachement);
+	public void start(Object result, String attachement);
+
+	public void process(Object result, String attachement);
+
+	public void end(Object result, String attachement);
 
 	public void error(Throwable exception, String attachment);
 

@@ -19,12 +19,10 @@ package org.fubabaz.rpm.service.sql;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import org.fubabaz.rpm.connection.pool.ConnectionPoolFactory;
 import org.fubabaz.rpm.connection.pool.IConnectionPool;
-import org.fubabaz.rpm.exception.SystemException;
 import org.fubabaz.rpm.service.IServiceCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +37,7 @@ public class SqlExecuteService implements Runnable {
 
 	private IConnectionPool connectionPool;
 	private String sql;
+	private int fetchSize;
 	private IServiceCallback serviceCallback;
 
 	public SqlExecuteService(IServiceCallback serviceCallback) {
@@ -46,8 +45,9 @@ public class SqlExecuteService implements Runnable {
 		this.serviceCallback = serviceCallback;
 	}
 
-	public void setSql(String sql) {
+	public void setSql(String sql, int fetchSize) {
 		this.sql = sql;
+		this.fetchSize = fetchSize;
 	}
 
 	@Override
@@ -59,45 +59,13 @@ public class SqlExecuteService implements Runnable {
 		try {
 			preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_UPDATABLE);
+			preparedStatement.setFetchSize(this.fetchSize);
 			resultSet = preparedStatement.executeQuery();
-			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-			int columnCnt = resultSetMetaData.getColumnCount();
-			resultSet.last();
-			int totalRow = resultSet.getRow();
-			resultSet.beforeFirst();
-			SqlResultInfo sqlResultInfo = new SqlResultInfo(totalRow);
-			LOGGER.debug("columnCnt:{}, totalRow:{}", columnCnt, totalRow);
-			for (int i = 0; i < columnCnt; i++) {
-				ColumnMetaInfo columnMetaInfo = new ColumnMetaInfo();
-				columnMetaInfo.setLabel(resultSetMetaData.getColumnLabel(i + 1));
-				columnMetaInfo.setWidth(resultSetMetaData.getColumnDisplaySize(i + 1));
-				sqlResultInfo.addColumnMetaInfo(columnMetaInfo);
-			}
-			try {
-				while (resultSet.next()) {
-					Object[] row = new Object[columnCnt];
-					for (int i = 0; i < columnCnt; i++) {
-						row[i] = resultSet.getObject(i + 1);
-					}
-					sqlResultInfo.addRow(resultSet.getRow() - 1, row);
-				}
-			} catch (SQLException e) {
-				throw new SystemException(e);
-			}
-			serviceCallback.success(sqlResultInfo, sql);
+			SqlResultInfo sqlResultInfo = new SqlResultInfo(connection, preparedStatement, resultSet, serviceCallback,
+					this.fetchSize);
+			sqlResultInfo.fetchRows();
 		} catch (SQLException e) {
 			serviceCallback.error(e, sql);
-		} finally {
-			try {
-				if (preparedStatement != null) {
-					preparedStatement.close();
-				}
-				if (connection != null) {
-					connection.close();
-				}
-			} catch (SQLException e) {
-				// Ignore.
-			}
 		}
 	}
 }
