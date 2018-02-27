@@ -45,18 +45,23 @@ public class SqlResultInfo {
 	private Object[] rows;
 	private int totalRows;
 	private int fetchSize;
-	private int currentRow = 0;
+	private int currentRow;
 	private int columnCnt;
-	private boolean isFirst = true;
-	private boolean isLast = false;
+	private boolean isFirst;
+	private boolean isLast;
 
-	public SqlResultInfo(Connection connection, Statement statement, ResultSet resultSet,
-			IServiceCallback serviceCallback, int fetchSize) {
+	public SqlResultInfo(IServiceCallback serviceCallback) {
+		this.serviceCallback = serviceCallback;
+	}
+
+	public void setUp(Connection connection, Statement statement, ResultSet resultSet, int fetchSize) {
 		this.connection = connection;
 		this.statement = statement;
 		this.resultSet = resultSet;
-		this.serviceCallback = serviceCallback;
 		this.fetchSize = fetchSize;
+		this.currentRow = 0;
+		this.isFirst = true;
+		this.isLast = false;
 		initResultInfo();
 	}
 
@@ -64,6 +69,7 @@ public class SqlResultInfo {
 		try {
 			ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
 			this.columnCnt = resultSetMetaData.getColumnCount();
+			this.columnMetaInfoList.clear();
 			for (int i = 0; i < this.columnCnt; i++) {
 				ColumnMetaInfo columnMetaInfo = new ColumnMetaInfo();
 				columnMetaInfo.setLabel(resultSetMetaData.getColumnLabel(i + 1));
@@ -81,6 +87,14 @@ public class SqlResultInfo {
 
 	public List<ColumnMetaInfo> getColumnMetaInfoList() {
 		return columnMetaInfoList;
+	}
+
+	public int getTotalRowCount() {
+		return this.totalRows;
+	}
+
+	public int getCurrentRowIndex() {
+		return this.currentRow;
 	}
 
 	public Object[] getRowData() {

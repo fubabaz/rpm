@@ -39,10 +39,12 @@ public class SqlExecuteService implements Runnable {
 	private String sql;
 	private int fetchSize;
 	private IServiceCallback serviceCallback;
+	private SqlResultInfo sqlResultInfo;
 
 	public SqlExecuteService(IServiceCallback serviceCallback) {
 		this.connectionPool = ConnectionPoolFactory.getInstance().getConnectionPool();
 		this.serviceCallback = serviceCallback;
+		this.sqlResultInfo = new SqlResultInfo(serviceCallback);
 	}
 
 	public void setSql(String sql, int fetchSize) {
@@ -53,16 +55,16 @@ public class SqlExecuteService implements Runnable {
 	@Override
 	public void run() {
 		LOGGER.debug("SQL:{}", sql);
+		sqlResultInfo.close();
 		Connection connection = this.connectionPool.getConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		try {
 			preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_UPDATABLE);
-			preparedStatement.setFetchSize(this.fetchSize);
+			preparedStatement.setFetchSize(fetchSize);
 			resultSet = preparedStatement.executeQuery();
-			SqlResultInfo sqlResultInfo = new SqlResultInfo(connection, preparedStatement, resultSet, serviceCallback,
-					this.fetchSize);
+			sqlResultInfo.setUp(connection, preparedStatement, resultSet, fetchSize);
 			sqlResultInfo.fetchRows();
 		} catch (SQLException e) {
 			serviceCallback.error(e, sql);

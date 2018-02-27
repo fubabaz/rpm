@@ -23,6 +23,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -348,6 +350,14 @@ public class ConnectionDialog extends Dialog {
 
 					LOGGER.debug("binding connectionInfo:{}", connectionInfoBinder.getConnectionInfo());
 				}
+			}
+		});
+
+		connectionListViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				buttonPressed(IDialogConstants.OK_ID);
 			}
 		});
 		return area;
