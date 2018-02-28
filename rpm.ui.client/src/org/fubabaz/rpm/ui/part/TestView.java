@@ -101,6 +101,8 @@ public class TestView extends SqlServiceView {
 		createTalbeColumns(sqlResultInfo.getColumnMetaInfoList());
 
 		tableViewer.add(sqlResultInfo.getRowData());
+
+		LOGGER.debug("time:{}", String.format("%.3f", sqlResultInfo.getDuration()));
 	}
 
 	@Override
@@ -109,6 +111,8 @@ public class TestView extends SqlServiceView {
 
 		sqlResultInfo = (SqlResultInfo) result;
 		tableViewer.add(sqlResultInfo.getRowData());
+
+		LOGGER.debug("time:{}", String.format("%.3f", sqlResultInfo.getDuration()));
 	}
 
 	private void removeTableColumns() {

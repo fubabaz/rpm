@@ -49,6 +49,7 @@ public class SqlResultInfo {
 	private int columnCnt;
 	private boolean isFirst;
 	private boolean isLast;
+	private long duration;
 
 	public SqlResultInfo(IServiceCallback serviceCallback) {
 		this.serviceCallback = serviceCallback;
@@ -97,11 +98,16 @@ public class SqlResultInfo {
 		return this.currentRow;
 	}
 
+	public double getDuration() {
+		return this.duration/1000.0;
+	}
+
 	public Object[] getRowData() {
 		return rows;
 	}
 
 	public void fetchRows() {
+		long startTime = System.currentTimeMillis();
 		if (isLast) {
 			return;
 		}
@@ -127,6 +133,7 @@ public class SqlResultInfo {
 			this.serviceCallback.error(e, "");
 		}
 
+		duration = System.currentTimeMillis() - startTime;
 		if (isFirst) {
 			isFirst = false;
 			this.serviceCallback.start(this, "");

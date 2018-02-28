@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_c3AF0MjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.application" bindingContexts="_c3AF2cjYEeSyMNYR5xypkQ">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_c3AF0cjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.window.main" label="RPM" iconURI="platform:/plugin/rpm.ui.client/icons/rpm.ico" x="10" y="10" width="1200" height="800">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_c3AF0cjYEeSyMNYR5xypkQ" elementId="org.eclipse.e4.window.main" label="RPM" iconURI="platform:/plugin/rpm.ui.client/icons/rpm.ico" x="80" y="60" width="1800" height="1000">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_JjNeEBacEeipZfMcPxmdSA" elementId="rpm.ui.client.perspectivestack.0">
       <children xsi:type="advanced:Perspective" xmi:id="_K4xi0BacEeipZfMcPxmdSA" elementId="rpm.ui.client.perspective.0">
         <children xsi:type="basic:PartSashContainer" xmi:id="_Yoj8gBawEeipZfMcPxmdSA" elementId="rpm.ui.client.partsashcontainer.0" selectedElement="_33t3QBacEeipZfMcPxmdSA">
-          <children xsi:type="basic:PartStack" xmi:id="_33t3QBacEeipZfMcPxmdSA" elementId="rpm.ui.client.partstack.0" selectedElement="_O_VvkBacEeipZfMcPxmdSA">
+          <children xsi:type="basic:PartStack" xmi:id="_33t3QBacEeipZfMcPxmdSA" elementId="rpm.ui.client.partstack.0" selectedElement="_Am0iIBuPEeig2JEH5DdDvQ">
+            <children xsi:type="basic:Part" xmi:id="_Am0iIBuPEeig2JEH5DdDvQ" elementId="rpm.ui.client.part.systemmonitor" contributionURI="bundleclass://rpm.ui.client/org.fubabaz.rpm.ui.part.SystemMonitorView" label="SystemMonitor"/>
             <children xsi:type="basic:Part" xmi:id="_O_VvkBacEeipZfMcPxmdSA" elementId="rpm.ui.client.part.test" contributionURI="bundleclass://rpm.ui.client/org.fubabaz.rpm.ui.part.TestView" label="Test"/>
           </children>
         </children>
@@ -21,6 +22,7 @@
     <trimBars xmi:id="_9GGHgBCEEeieWLMHIdYM9w" elementId="rpm.ui.client.trimbar.0">
       <children xsi:type="menu:ToolBar" xmi:id="_FWy88BCGEeieWLMHIdYM9w" elementId="rpm.ui.client.toolbar.0">
         <children xsi:type="menu:HandledToolItem" xmi:id="_i38GoBCGEeieWLMHIdYM9w" elementId="rpm.ui.client.handledtoolitem.connection" label="Connection" iconURI="platform:/plugin/rpm.ui.client/icons/add_att.png" command="_pJakYBCJEeieWLMHIdYM9w"/>
+        <children xsi:type="menu:ToolBarSeparator" xmi:id="__dhUkBuKEeig2JEH5DdDvQ" elementId="rpm.ui.client.toolbarseparator.0"/>
       </children>
     </trimBars>
   </children>
