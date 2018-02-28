@@ -21,7 +21,7 @@ public class SystemMonitorView {
 	public void createComposite(Composite parent) {
 		mainSashForm = new SashForm(parent, SWT.SMOOTH);
 
-		SashForm leftSashForm = new SashForm(mainSashForm, SWT.BORDER | SWT.SMOOTH | SWT.VERTICAL);
+		SashForm leftSashForm = new SashForm(mainSashForm, SWT.NONE | SWT.SMOOTH | SWT.VERTICAL);
 		leftSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		ScrolledComposite dbInfoScomp = new ScrolledComposite(leftSashForm, SWT.NONE | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -31,9 +31,6 @@ public class SystemMonitorView {
 		Composite dbInfoComp = new Composite(dbInfoScomp, SWT.NONE);
 		dbInfoComp.setLayout(new GridLayout(1, false));
 		
-		Label databaseLabel = new Label(dbInfoComp, SWT.NONE);
-		databaseLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		databaseLabel.setText("Database");
 
 		dbInfoScomp.setContent(dbInfoComp);
 		dbInfoScomp.setMinSize(dbInfoComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -54,7 +51,7 @@ public class SystemMonitorView {
 
 		leftSashForm.setWeights(new int[] { 60, 60 });
 
-		SashForm rightSashForm = new SashForm(mainSashForm, SWT.BORDER | SWT.SMOOTH | SWT.VERTICAL);
+		SashForm rightSashForm = new SashForm(mainSashForm, SWT.NONE | SWT.SMOOTH | SWT.VERTICAL);
 		rightSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		ScrolledComposite activityScomp = new ScrolledComposite(rightSashForm, SWT.NONE | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -83,7 +80,7 @@ public class SystemMonitorView {
 		loadProfileScomp.setContent(loadProfileComp);
 		loadProfileScomp.setMinSize(loadProfileComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
-		SashForm bottomSashForm = new SashForm(rightSashForm, SWT.BORDER | SWT.SMOOTH | SWT.VERTICAL);
+		SashForm bottomSashForm = new SashForm(rightSashForm, SWT.NONE | SWT.SMOOTH | SWT.VERTICAL);
 
 		ScrolledComposite sqlMonitoringScomp = new ScrolledComposite(bottomSashForm, SWT.NONE | SWT.H_SCROLL | SWT.V_SCROLL);
 		sqlMonitoringScomp.setExpandHorizontal(true);

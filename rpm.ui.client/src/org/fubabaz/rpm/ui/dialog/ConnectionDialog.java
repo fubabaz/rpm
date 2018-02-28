@@ -115,7 +115,7 @@ public class ConnectionDialog extends Dialog {
 		area.setLayout(new GridLayout(2, false));
 
 		Composite listComp = new Composite(area, SWT.NONE);
-		GridData gd_listComp = new GridData(SWT.FILL, SWT.FILL, true, true);
+		GridData gd_listComp = new GridData(SWT.FILL, SWT.FILL, true, false);
 		gd_listComp.widthHint = 360;
 		listComp.setLayoutData(gd_listComp);
 		listComp.setLayout(new GridLayout(1, false));
@@ -171,18 +171,16 @@ public class ConnectionDialog extends Dialog {
 		});
 
 		Composite container = new Composite(area, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		container.setLayout(new GridLayout(1, false));
 
-		Composite dbmsComposite = new Composite(container, SWT.NONE);
-		dbmsComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-		dbmsComposite.setLayout(new GridLayout(2, false));
+		Composite dbmsComposite = new Composite(container, SWT.BORDER);
+		dbmsComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		dbmsComposite.setLayout(new GridLayout(2, true));
 
-		Label lbl_dbms = new Label(dbmsComposite, SWT.NONE);
+		Label lbl_dbms = new Label(dbmsComposite, SWT.RIGHT);
 		lbl_dbms.setText("Database");
-		GridData gd_dbms = new GridData(SWT.CENTER, SWT.CENTER, false, false);
-		gd_dbms.widthHint = 80;
-		lbl_dbms.setLayoutData(gd_dbms);
+		lbl_dbms.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		dbmsCls = new Combo(dbmsComposite, SWT.BORDER | SWT.READ_ONLY);
 		for (DbmsType dbmsType : DbmsType.values()) {
@@ -207,7 +205,8 @@ public class ConnectionDialog extends Dialog {
 			}
 		});
 
-		Label lbl_connctionName = new Label(dbmsComposite, SWT.NONE);
+		Label lbl_connctionName = new Label(dbmsComposite, SWT.RIGHT);
+		lbl_connctionName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		lbl_connctionName.setText("Display Name");
 
 		connctionName = new Text(dbmsComposite, SWT.BORDER);
@@ -217,9 +216,9 @@ public class ConnectionDialog extends Dialog {
 		dbmsGroup.setText("Connection Info.");
 		GridLayout gl_dbmsGroup = new GridLayout(3, false);
 		dbmsGroup.setLayout(gl_dbmsGroup);
-		dbmsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		dbmsGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-		Label lbl_host = new Label(dbmsGroup, SWT.NONE);
+		Label lbl_host = new Label(dbmsGroup, SWT.RIGHT);
 		lbl_host.setText("Host");
 		lbl_host.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		host = new Text(dbmsGroup, SWT.BORDER);
@@ -236,7 +235,7 @@ public class ConnectionDialog extends Dialog {
 			}
 		});
 
-		Label lbl_port = new Label(dbmsGroup, SWT.NONE);
+		Label lbl_port = new Label(dbmsGroup, SWT.RIGHT);
 		lbl_port.setText("Port");
 		lbl_port.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		port = new Text(dbmsGroup, SWT.BORDER);
@@ -283,12 +282,14 @@ public class ConnectionDialog extends Dialog {
 		Label lbl_1 = new Label(dbmsGroup, SWT.SEPARATOR | SWT.HORIZONTAL);
 		lbl_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 
-		Label lbl_username = new Label(dbmsGroup, SWT.NONE);
+		Label lbl_username = new Label(dbmsGroup, SWT.RIGHT);
+		lbl_username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lbl_username.setText("User Name");
 		user = new Text(dbmsGroup, SWT.BORDER);
 		user.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 2, 1));
 
-		Label lbl_password = new Label(dbmsGroup, SWT.NONE);
+		Label lbl_password = new Label(dbmsGroup, SWT.RIGHT);
+		lbl_password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lbl_password.setText("Password");
 		password = new Text(dbmsGroup, SWT.BORDER | SWT.PASSWORD);
 		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 2, 1));
@@ -302,7 +303,7 @@ public class ConnectionDialog extends Dialog {
 		Label lbl_2 = new Label(dbmsGroup, SWT.SEPARATOR | SWT.HORIZONTAL);
 		lbl_2.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 
-		Label lbl_option = new Label(dbmsGroup, SWT.NONE);
+		Label lbl_option = new Label(dbmsGroup, SWT.RIGHT);
 		lbl_option.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lbl_option.setText("JDBC Option");
 
@@ -332,6 +333,8 @@ public class ConnectionDialog extends Dialog {
 
 					connctionName.setText(connectionName);
 					dbmsCls.select(DbmsType.getIndex(connectionInfo.getDbmsType()));
+					dbmsCls.notifyListeners(SWT.Selection, new Event());
+
 					host.setText(connectionInfo.getHost());
 					port.setText(String.valueOf(connectionInfo.getPort()));
 					connectType.select(connectionInfo.getConnectType());
@@ -424,7 +427,7 @@ public class ConnectionDialog extends Dialog {
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(740, 560);
+		return new Point(740, 500);
 	}
 
 	@Override

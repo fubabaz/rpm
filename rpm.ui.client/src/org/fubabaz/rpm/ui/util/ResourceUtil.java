@@ -26,7 +26,10 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -37,6 +40,8 @@ import org.osgi.framework.FrameworkUtil;
 public class ResourceUtil {
 
 	private static Map<ImagePath,Image> IMAGE_MAP = new HashMap<ImagePath,Image>();
+	private static Map<RGB, Color> COLOR_MAP = new HashMap<RGB, Color>();
+
 	private static Bundle bundle = FrameworkUtil.getBundle(ResourceUtil.class);
 	private static ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 	
@@ -50,4 +55,21 @@ public class ResourceUtil {
 		return image;
 	}
 
+	public static Color getColor(RGB rgb) {
+		Color color = COLOR_MAP.get(rgb);
+		if (color == null) {
+			color = resourceManager.createColor(rgb);
+			COLOR_MAP.put(rgb, color);
+		}
+		return color;
+	}
+
+	public static Color getColor(int r, int g, int b) {
+		return getColor(new RGB(r, g, b));
+	}
+
+	public static Color getColor(int systemColorID) {
+		Display display = Display.getCurrent();
+		return display.getSystemColor(systemColorID);
+	}
 }

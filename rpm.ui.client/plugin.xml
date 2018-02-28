@@ -16,6 +16,10 @@
                name="appName"
                value="rpm.ui.client">
          </property>
+         <property
+               name="applicationCSS"
+               value="platform:/plugin/rpm.ui.client/css/default.css">
+         </property>
       </product>
    </extension>
 

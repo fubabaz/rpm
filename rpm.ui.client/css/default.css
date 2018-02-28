@@ -1,0 +1,60 @@
+Composite {
+	background-color: #f5fafa;
+}
+
+Composite Label {
+	background-color: #f5fafa;
+  color: black;
+}
+
+Composite Text {
+	background-color: #f5fcfc;
+  color: black;
+}
+
+Label {
+  color: black;
+}
+
+Text {
+  font: Verdana 10px;
+}
+
+Combo {
+	font: Verdana 10px;
+	background-color: white;
+	color: black;
+}
+
+Button {
+	font: Verdana 10px;
+}
+
+Group {
+
+}
+
+SashForm {
+  background-color: #c1d5ef;
+}
+
+.MPart{
+
+}
+
+.MPartStack{
+	
+}
+
+.MPartSashContainer{
+	
+}
+
+.MTrimBar {
+  color: grey;
+  font: Verdana 8px;
+}
+
+Shell {
+  #background-color: #e3efff #c1d5ef 60%;
+}
