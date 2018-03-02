@@ -1,29 +1,30 @@
 Composite {
-	background-color: #f5fafa;
+	background-color: #d7dce1;
 }
 
 Composite Label {
-	background-color: #f5fafa;
-  color: black;
+	background-color: #d7dce1;
+  color: #000000;
 }
 
 Composite Text {
-	background-color: #f5fcfc;
-  color: black;
+	background-color: #ffffff;
+  color: #000000;
 }
 
 Label {
-  color: black;
+  color: #000000;
 }
 
 Text {
   font: Verdana 10px;
+  color: #000000;
 }
 
 Combo {
 	font: Verdana 10px;
-	background-color: white;
-	color: black;
+	background-color: #ffffff;
+	color: #000000;
 }
 
 Button {
@@ -31,30 +32,44 @@ Button {
 }
 
 Group {
-
+	font: Verdana 10px;
+	color: #000000;
 }
 
 SashForm {
-  background-color: #c1d5ef;
+  background-color: #c9d2e0;
 }
 
 .MPart{
-
+	background-color: #c9d2e0;
 }
 
-.MPartStack{
-	
+.MPartStack {
+  swt-tab-renderer: url('bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.CTabRendering');
+  
+  swt-selected-tab-fill: #c7c9cc #edeeef 100%; /* title background for selected tab */
+	swt-unselected-tabs-color: #edeeef #c9d2e0 100% 100%; /* title background for unselected tab */
+	swt-outer-keyline-color: #b3bec6; /* border color for whole tabs container */
+	swt-inner-keyline-color: #b3bec6;
+	swt-tab-outline: #b3bec6; /* border color for selected tab */
+  
+  padding: 0px 1px 1px;
+  swt-shadow-visible: false;
+  swt-mru-visible: true;
+  swt-corner-radius: 10px;
+  
+	color: #798187;
 }
 
 .MPartSashContainer{
-	
+	background-color: #b3bec6;
 }
 
 .MTrimBar {
-  color: grey;
   font: Verdana 8px;
+  color: #ffffff;
 }
 
 Shell {
-  #background-color: #e3efff #c1d5ef 60%;
+  background-color: #d7dce1 #d7dce1 60%;
 }
