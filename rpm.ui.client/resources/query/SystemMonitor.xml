@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+	<entry key="monitor.system.database">
+		SELECT dbid
+		,name
+		,db_unique_name
+		,log_mode
+		,platform_name
+		,created
+		FROM v$database
+	</entry>
+</properties>
