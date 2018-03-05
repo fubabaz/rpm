@@ -31,6 +31,9 @@ Button {
 	font: Verdana 10px;
 }
 
+Button[style~='SWT.PUSH'] {
+}
+
 Group {
 	font: Verdana 10px;
 	color: #000000;

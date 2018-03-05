@@ -253,7 +253,7 @@ public class ConnectionDialog extends Dialog {
 			}
 		});
 
-		btn_ping = new Button(dbmsGroup, SWT.NONE);
+		btn_ping = new Button(dbmsGroup, SWT.PUSH);
 		btn_ping.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btn_ping.setText("Ping");
 		btn_ping.setEnabled(false);
